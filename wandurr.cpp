@@ -8,7 +8,8 @@
 // have fun playing around with a little game programming. :)
 
 // These instructions work on Ubuntu, which is a flavor of Debian, which is a
-// type of Linux.
+// type of Linux.  In the following instructions, when it says to type something
+// don't type the // characters at the beginning of the line.
 
 // If you don't have an Ubuntu machine, you can either install Ubuntu on your
 // computer at home by learning here:
@@ -25,9 +26,9 @@
 //      sudo apt-get install build-essential git libncurses5-dev libncursesw5-dev dhex
 
 // If you don't have sudo access, google "get sudo access ubuntu".
-// You don't *have* to install dhex, but it is a nice hex editor.
+// You don't *have* to install dhex, but it is a nice-to-have hex editor.
 
-// Then run these commands at the linux shell prompt (don't type the // characters):
+// Then run these commands at the linux shell prompt:
 
 //      cd ~
 //      mkdir code
