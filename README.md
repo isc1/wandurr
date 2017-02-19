@@ -28,7 +28,7 @@ Then run these commands:
     cd ~
     mkdir code
     cd code
-    git clone git@github.com:isc1/wandurr.git
+    git clone https://github.com/isc1/wandurr.git
     cd wandurr
     g++ -std=c++11 -Wall -g -o wandurr wandurr.cpp -lncurses
 
