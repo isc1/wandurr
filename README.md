@@ -23,7 +23,7 @@ typing the following command at the shell prompt (you need sudo access):
 If you don't have sudo access, google "get sudo access ubuntu".
 You don't *have* to install dhex, but it is a nice hex editor.
 
-Then run these commands:
+Then run these commands at the linux shell prompt:
 
     cd ~
     mkdir code
