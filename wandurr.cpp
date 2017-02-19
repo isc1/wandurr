@@ -1,4 +1,4 @@
-// wandurr.cpp - game of wandering around doing stuff in c++/ncurses
+// wandurr.cpp - game of wandering around doing stuff written in c++/ncurses
 // copyright 2017 inhabited.systems
 // This program is covered by the MIT License.
 // See the file LICENSE included with this distrubution for terms.
