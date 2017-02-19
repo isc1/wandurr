@@ -41,6 +41,13 @@
 
 //      ./wandurr
 
+// If you are learning to program, there is NOTHING that is more helpful to you than
+// having a friend who is experienced with the language and tools you are trying to learn
+// who can help you when you get stuck or have questions.  Failing that, you can go to
+// places like IRC, reddit and other forums to ask questions.  But a friend who can
+// help you in person is worth his or her weight in gold!  If you find such a friend, BE
+// NICE AND POLITE TO THEM, AND LISTEN CAREFULLY TO WHAT THEY TELL YOU. :-)
+
 #include <stdlib.h>
 #include <ncurses.h>
 #include <math.h>
