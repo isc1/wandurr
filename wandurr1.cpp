@@ -26,7 +26,7 @@ void drawhelpscreen();
 static void finish(int sig);
 
 int row = 0, col = 0;
-const int rows = 15, cols = 40;
+const int rows = 15, cols = 40, cpairs=7;
 vector<vector<int> > vec2d;
 
 int main(void)
@@ -49,7 +49,7 @@ int main(void)
     vec2d.resize(rows);
     for (int i = 0; i < rows; ++i)
         vec2d[i].resize(cols);
-    vec2dinitrandint(vec2d, 7);
+    vec2dinitrandint(vec2d, cpairs);
     print2dvec(vec2d, "vec2d");
 
     if (has_colors())
@@ -125,6 +125,7 @@ void drawgamescreen()
             //attrset(COLOR_PAIR(rand()%7+1));
             attrset(COLOR_PAIR(vec2d[row][col]+1));
             if (vec2d[row][col] > 0) vec2d[row][col]=vec2d[row][col]-1;
+            else vec2d[row][col] =  rand()%cpairs;
             addch(' ');
         }
     }
