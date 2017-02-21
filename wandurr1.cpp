@@ -49,7 +49,7 @@ int main(void)
     vec2d.resize(rows);
     for (int i = 0; i < rows; ++i)
         vec2d[i].resize(cols);
-    vec2dinitrandint(vec2d, 6);
+    vec2dinitrandint(vec2d, 7);
     print2dvec(vec2d, "vec2d");
 
     if (has_colors())
@@ -58,13 +58,14 @@ int main(void)
         refresh();
         //getch();
         start_color();
+        init_pair(0, COLOR_WHITE, COLOR_BLACK);
         init_pair(1, COLOR_WHITE, COLOR_RED);
         init_pair(2, COLOR_WHITE, COLOR_GREEN);
         init_pair(3, COLOR_WHITE, COLOR_YELLOW);
         init_pair(4, COLOR_WHITE, COLOR_BLUE);
-        init_pair(5, COLOR_WHITE, COLOR_RED);
-        init_pair(6, COLOR_WHITE, COLOR_MAGENTA);
-        init_pair(7, COLOR_WHITE, COLOR_CYAN);
+        init_pair(5, COLOR_WHITE, COLOR_MAGENTA);
+        init_pair(6, COLOR_WHITE, COLOR_CYAN);
+        init_pair(7, COLOR_WHITE, COLOR_WHITE);
     }
 
 
