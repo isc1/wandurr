@@ -18,10 +18,9 @@ Windows and OS X machines, but I don't have that now. :-(
 To compile this program on Ubuntu, first install the tools you will need by
 typing the following command at the shell prompt (you need sudo access):
 
-    sudo apt-get install build-essential git libncurses5-dev libncursesw5-dev dhex
+    sudo apt-get install build-essential git libncurses5-dev libncursesw5-dev
 
 If you don't have sudo access, google "get sudo access ubuntu".
-You don't *have* to install dhex, but it is a nice hex editor.
 
 Then run these commands at the linux shell prompt:
 
@@ -30,9 +29,9 @@ Then run these commands at the linux shell prompt:
     cd code
     git clone https://github.com/isc1/wandurr.git
     cd wandurr
-    g++ -std=c++11 -Wall -g -o wandurr wandurr.cpp -lncurses
+    g++ -std=c++11 -Wall -g -o wandurr1 wandurr1.cpp -lncurses
 
 Then run the game by typing this:
 
-    ./wandurr
+    ./wandurr1
 

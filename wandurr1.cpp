@@ -1,55 +1,13 @@
-// wandurr1.cpp - game of wandering around doing stuff written in c++/ncurses
+// wandurr1.cpp - game of wandering around doing stuff written in c++/ncurses hurr durr
 // copyright 2017 inhabited.systems
 // This program is covered by the MIT License.
-// See the file LICENSE included with this distrubution for terms.
+// See the file LICENSE included with this distribution for terms.
+
+// see the file README.md for more information, including how to compile and
+// run this program.
 
 // wandurr1 does not use classes, so this code will look more C-like.  I may do
 // a wandurr2 that uses classes.
-
-// This game is really just a fun coding exercise for me, and I hope
-// I write it in such a way that new c++ coders might be able to
-// have fun playing around with a little game programming. :)
-
-// These instructions work on Ubuntu, which is a flavor of Debian, which is a
-// type of Linux.  In the following instructions, when it says to type something
-// don't type the // characters at the beginning of the line.
-
-// If you don't have an Ubuntu machine, you can either install Ubuntu on your
-// computer at home by learning here:
-
-//      https://www.ubuntu.com/download/desktop/install-ubuntu-desktop
-
-// ...or you can create a virtual Ubuntu host at somewhere like digitalocean.com
-// for a few dollars a month.  I may add instructions later for how to build on
-// Windows and OS X machines, but I don't have that now. :-(
-
-// To compile this program on Ubuntu, first install the tools you will need by
-// typing the following command at the shell prompt (you need sudo access):
-
-//      sudo apt-get install build-essential git libncurses5-dev libncursesw5-dev dhex
-
-// If you don't have sudo access, google "get sudo access ubuntu".
-// You don't *have* to install dhex, but it is a nice-to-have hex editor.
-
-// Then run these commands at the linux shell prompt:
-
-//      cd ~
-//      mkdir code
-//      cd code
-//      git clone https://github.com/isc1/wandurr.git
-//      cd wandurr
-//      g++ -std=c++11 -Wall -g -o wandurr1 wandurr1.cpp -lncurses
-
-// Then run the game by typing this:
-
-//      ./wandurr1
-
-// If you are learning to program, there is NOTHING that is more helpful to you than
-// having a friend who is experienced with the language and tools you are trying to learn
-// who can help you when you get stuck or have questions.  Failing that, you can go to
-// places like stackechange, IRC, reddit and other forums to ask questions.  But a friend
-// who can help you in person is worth his or her weight in gold!  If you find such a
-// friend, BE NICE AND POLITE TO THEM, AND LISTEN CAREFULLY TO WHAT THEY TELL YOU. :-)
 
 #include <stdlib.h>
 #include <ncurses.h>
@@ -60,44 +18,25 @@
 #include <string>
 using namespace std;
 
+void vec2dinitrandint(vector<vector<int>>& pvec, int rsize);
+void print2dvec(vector<vector<int>> pvec, string title);
+void drawgamescreen();
+void drawhelpscreen();
+
 static void finish(int sig);
 
-void vec2dinitrandint(vector<vector<int>>& pvec, int rsize)
-{
-        for (unsigned int i = 0; i < pvec.size(); i++) {
-                    for (unsigned int j = 0; j < pvec[i].size(); j++) {
-                                    pvec[i][j] = rand()%rsize;
-                                                // cout << "pvec[" << i << "][" << j << "] = " << pvec[i][j] << "\n";
-                                            }
-                        }
-}
-
-void print2dvec(vector<vector<int>> pvec, string title)
-{
-        // print out the 2d vector of int passed in as pvec
-        cout << "\n" << title << "\n";
-            for (unsigned int i = 0; i < pvec.size(); i++) {
-                        for (unsigned int j = 0; j < pvec[i].size(); j++)
-                                        cout << pvec[i][j] << " ";
-                                cout << "\n";
-                                    }
-                cout << "\n";
-}
-
-static void finish(int sig)
-{
-    endwin();
-    exit(0);
-}
+int row = 0, col = 0;
+const int rows = 15, cols = 40;
+vector<vector<int> > vec2d;
 
 int main(void)
 {
-    int row = 0, col = 0;
+    //int row = 0, col = 0;
 
     time_t timenow;
     timenow = time(NULL);
     srand(timenow);
-    const int rows = 15, cols = 40;
+    //const int rows = 15, cols = 40;
 
     (void) signal(SIGINT, finish);
     (void) initscr();
@@ -106,7 +45,7 @@ int main(void)
     (void) cbreak();
     (void) echo();
 
-    vector<vector<int> > vec2d;
+//    vector<vector<int> > vec2d;
     vec2d.resize(rows);
     for (int i = 0; i < rows; ++i)
         vec2d[i].resize(cols);
@@ -131,7 +70,7 @@ int main(void)
 
     initscr();
 
-    addstr("Wandurr!  This is just a stub program that shows some colors, it is not the real game yet.  Press any key to begin:\n");
+    addstr("Wandurr! Press any key to begin:\n");
     curs_set(0);
     refresh();
     getch();
@@ -141,19 +80,8 @@ int main(void)
     move(16,0);
     addstr("Press any key to quit.\n");
     while(ERR == getch()) {
-        //printw("%d\r", value++);
-        //napms(0.00001);
-        
-        for(row=0; row < rows; row++) {
-            for(col=0; col < cols; col++) {
-                move(row,col);
-                //attrset(COLOR_PAIR(rand()%7+1));
-                attrset(COLOR_PAIR(vec2d[row][col]+1));
-                if (vec2d[row][col] > 0) vec2d[row][col]=vec2d[row][col]-1;
-                addch(' ');
-            }
-        }
 
+        drawgamescreen();
         
         napms(1000);
         refresh();
@@ -162,4 +90,51 @@ int main(void)
     endwin();
     finish(0);
     return 0;
+}
+
+void vec2dinitrandint(vector<vector<int>>& pvec, int rsize)
+{
+        for (unsigned int i = 0; i < pvec.size(); i++) {
+                    for (unsigned int j = 0; j < pvec[i].size(); j++) {
+                                    pvec[i][j] = rand()%rsize;
+                                                // cout << "pvec[" << i << "][" << j << "] = " << pvec[i][j] << "\n";
+                                            }
+                        }
+}
+
+void print2dvec(vector<vector<int>> pvec, string title)
+{
+        // print out the 2d vector of int passed in as pvec
+        cout << "\n" << title << "\n";
+            for (unsigned int i = 0; i < pvec.size(); i++) {
+                        for (unsigned int j = 0; j < pvec[i].size(); j++)
+                                        cout << pvec[i][j] << " ";
+                                cout << "\n";
+                                    }
+                cout << "\n";
+}
+
+void drawgamescreen()
+{
+    int rowoffset = 1, coloffset = 1;
+
+    for(row=0; row < rows; row++) {
+        for(col=0; col < cols; col++) {
+            move(row+rowoffset,col+coloffset);
+            //attrset(COLOR_PAIR(rand()%7+1));
+            attrset(COLOR_PAIR(vec2d[row][col]+1));
+            if (vec2d[row][col] > 0) vec2d[row][col]=vec2d[row][col]-1;
+            addch(' ');
+        }
+    }
+}
+
+void drawhelpscreen()
+{
+}
+
+static void finish(int sig)
+{
+    endwin();
+    exit(0);
 }
