@@ -1,7 +1,10 @@
-// wandurr.cpp - game of wandering around doing stuff written in c++/ncurses
+// wandurr1.cpp - game of wandering around doing stuff written in c++/ncurses
 // copyright 2017 inhabited.systems
 // This program is covered by the MIT License.
 // See the file LICENSE included with this distrubution for terms.
+
+// wandurr1 does not use classes, so this code will look more C-like.  I may do
+// a wandurr2 that uses classes.
 
 // This game is really just a fun coding exercise for me, and I hope
 // I write it in such a way that new c++ coders might be able to
@@ -35,11 +38,11 @@
 //      cd code
 //      git clone https://github.com/isc1/wandurr.git
 //      cd wandurr
-//      g++ -std=c++11 -Wall -g -o wandurr wandurr.cpp -lncurses
+//      g++ -std=c++11 -Wall -g -o wandurr1 wandurr1.cpp -lncurses
 
 // Then run the game by typing this:
 
-//      ./wandurr
+//      ./wandurr1
 
 // If you are learning to program, there is NOTHING that is more helpful to you than
 // having a friend who is experienced with the language and tools you are trying to learn
