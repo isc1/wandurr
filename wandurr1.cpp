@@ -25,8 +25,8 @@ void drawhelpscreen();
 
 static void finish(int sig);
 
-int row = 0, col = 0;
-const int rows = 15, cols = 40, cpairs=7;
+int row = 0, col = 0, rows = 0, cols = 0;
+const int cpairs=7;
 vector<vector<int> > vec2d;
 
 int main(void)
@@ -45,12 +45,23 @@ int main(void)
     (void) cbreak();
     (void) echo();
 
+    initscr();
+
+    addstr("Wandurr! Press any key to begin:\n");
+    curs_set(0);
+    getmaxyx(stdscr,rows,cols);
+    rows-=2;
+    cols-=2;
+    printw("rows: %d cols: %d", rows, cols);
+    refresh();
+    getch();
+
 //    vector<vector<int> > vec2d;
     vec2d.resize(rows);
     for (int i = 0; i < rows; ++i)
         vec2d[i].resize(cols);
     vec2dinitrandint(vec2d, cpairs);
-    print2dvec(vec2d, "vec2d");
+    //print2dvec(vec2d, "vec2d");
 
     if (has_colors())
     {
@@ -69,22 +80,16 @@ int main(void)
     }
 
 
-    initscr();
-
-    addstr("Wandurr! Press any key to begin:\n");
-    curs_set(0);
-    refresh();
-    getch();
-
 
     nodelay(stdscr, TRUE);
-    move(16,0);
+    move(rows+1,0);
     addstr("Press any key to quit.\n");
+    getch();
     while(ERR == getch()) {
 
         drawgamescreen();
         
-        napms(1000);
+        //napms(100);
         refresh();
     }
 
@@ -105,6 +110,7 @@ void vec2dinitrandint(vector<vector<int>>& pvec, int rsize)
 
 void print2dvec(vector<vector<int>> pvec, string title)
 {
+    // TODO: change this crap to use ncurses instead of cout!!! or just delete this?
         // print out the 2d vector of int passed in as pvec
         cout << "\n" << title << "\n";
             for (unsigned int i = 0; i < pvec.size(); i++) {
@@ -119,8 +125,9 @@ void drawgamescreen()
 {
     int rowoffset = 1, coloffset = 1;
 
-    for(row=0; row < rows; row++) {
-        for(col=0; col < cols; col++) {
+    for(row=2; row < rows; row++) {
+        for(col=2; col < cols-3; col++) {
+            //            
             move(row+rowoffset,col+coloffset);
             //attrset(COLOR_PAIR(rand()%7+1));
             attrset(COLOR_PAIR(vec2d[row][col]+1));
@@ -128,6 +135,8 @@ void drawgamescreen()
             else vec2d[row][col] =  rand()%cpairs;
             addch(' ');
         }
+        napms(10);
+        refresh();
     }
 }
 
