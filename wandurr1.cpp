@@ -18,7 +18,8 @@
 #include <string>
 using namespace std;
 
-int row = 0, col = 0, rows = 0, cols = 0;
+int row = 0, col = 0, rows = 0, cols = 0, playery = 0, playerx = 0;
+int halfy = 0, halfx = 0;
 const int cpairs=7;
 
 typedef struct {
@@ -41,6 +42,7 @@ int main(void)
 {
     //int row = 0, col = 0;
 
+    int ch = 0;
     time_t timenow;
     timenow = time(NULL);
     srand(timenow);
@@ -58,6 +60,10 @@ int main(void)
     addstr("Wandurr! Press any key to begin:\n");
     curs_set(0);
     getmaxyx(stdscr,rows,cols);
+    halfy = rows/2;
+    halfx = cols/2;
+    playery = halfy;
+    playerx = halfx;
     rows-=2;
     cols-=2;
     printw("rows: %d cols: %d", rows, cols);
@@ -85,24 +91,47 @@ int main(void)
         init_pair(5, COLOR_WHITE, COLOR_MAGENTA);
         init_pair(6, COLOR_WHITE, COLOR_CYAN);
         init_pair(7, COLOR_WHITE, COLOR_WHITE);
+        init_pair(8, COLOR_YELLOW, COLOR_GREEN);
+        init_pair(9, COLOR_BLACK, COLOR_GREEN);
     }
-
-
 
     nodelay(stdscr, TRUE);
     move(rows+1,0);
     addstr("Press any key to quit.\n");
     getch();
-    while(ERR == getch()) {
 
+    keypad(stdscr, TRUE);
+    do
+    {
+        ch = getch();
+        switch(ch)
+        {
+            case KEY_DOWN:
+                //addstr("Down\n");
+                playery++;
+                break;
+            case KEY_UP:
+                //addstr("Up\n");
+                playery--;
+                break;
+            case KEY_LEFT:
+                //addstr("Left\n");
+                playerx--;
+                break;
+            case KEY_RIGHT:
+                //addstr("Right\n");
+                playerx++;
+                break;
+            default:
+                break;
+        }
         drawgamescreen();
-        
-        //napms(100);
         refresh();
-    }
+    } while(ch != '~');
+                
 
     endwin();
-    finish(0);
+    //finish(0);
     return 0;
 }
 
@@ -113,7 +142,7 @@ void vec2dinitrandint(vector<vector<Cell>>& pvec, int rsize)
         for (unsigned int j = 0; j < pvec[i].size(); j++)
         {
             // this is supposed to be green
-            pvec[i][j].color = 1;
+            pvec[i][j].color = 2;
             if (rand()%100==1) pvec[i][j].occupant = '$';
             else pvec[i][j].occupant = ' ';
             // cout << "pvec[" << i << "][" << j << "] = " << pvec[i][j].color << "\n";
@@ -145,14 +174,22 @@ void drawgamescreen()
         for(col=2; col < cols-3; col++) {
             move(row+rowoffset,col+coloffset);
             //attrset(COLOR_PAIR(rand()%7+1));
-            attrset(COLOR_PAIR(vec2d[row][col].color+1));
+            attrset(COLOR_PAIR(vec2d[row][col].color));
             //if (vec2d[row][col].color > 0) vec2d[row][col].color=vec2d[row][col].color-1;
             //else vec2d[row][col].color =  rand()%cpairs;
+            if(vec2d[row][col].occupant == '$')
+                attrset(COLOR_PAIR(8));
+            else
+                attrset(COLOR_PAIR(2));
+
             addch(vec2d[row][col].occupant);
         }
         //napms(10);
-        refresh();
     }
+    attrset(COLOR_PAIR(9));
+    move(playery,playerx);
+    addch('X');
+    refresh();
 }
 
 void drawhelpscreen()
