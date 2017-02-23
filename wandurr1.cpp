@@ -19,6 +19,7 @@
 using namespace std;
 
 int row = 0, col = 0, rows = 0, cols = 0;
+int rowrequired = 0, colrequired = 0;
 int playery = 0, playerx = 0, halfy = 0, halfx = 0;
 int score = 0;
 const int cpairs=7;
@@ -40,18 +41,19 @@ typedef struct
 } Creature;
             
 vector<vector<Cell> > gameworld;
+WINDOW *helpwindow;
 
 void gamesetup();
 void drawintroscreen();
-void drawhelpscreen();
+void setuphelpwindow();
+void drawhelpwindow();
 void drawgamescreen();
 void gameworldinit(vector<vector<Cell>>& pvec, int rsize);
 void print2dvec(vector<vector<Cell>> pvec, string title);
+void crash(string msg);
 
 int main(void)
 {
-    //int row = 0, col = 0;
-
     int ch = 0;
     time_t timenow;
     timenow = time(NULL);
@@ -143,17 +145,58 @@ void gamesetup()
     playerx = halfx;
     rows-=2;
     cols-=2;
+    setuphelpwindow();
 }
 
 void drawintroscreen()
 {
-    mvaddstr(halfy,halfx,"Wandurr! Press any key to begin:\n");
-    printw("rows: %d cols: %d", rows, cols);
+    int linecount;
+    string tmpstring;
+    const char *cptr;
+    
+    vector<string> introtext;
+    introtext.push_back("WANDURR1\n");
+    introtext.push_back("-------------------------------------\n");
+    introtext.push_back("AN AMAZING GAME OF\n");
+    introtext.push_back("WALKING AROUND AND STUFF hurr durr\n");
+    introtext.push_back("\n");
+    introtext.push_back("In Game:\n");
+    introtext.push_back("Use arrow keys to move.\n");
+    introtext.push_back("Pick up $ to increase score.\n");
+    introtext.push_back("press F1 for Help.\n");
+    introtext.push_back("press ~ to quit.\n");
+    introtext.push_back("\n");
+    introtext.push_back("PRESS ANY KEY TO BEGIN YOUR GLORIOUS\n");
+    introtext.push_back("ADVENTURE OF SUPREME 3D VR INTENSITY\n");
+    introtext.push_back("\n");
+    linecount = introtext.size();
+    // comment these out after debugging
+    linecount++;
+    tmpstring = "Screensize = (" + to_string(rows) + "," + to_string(cols) + ")";
+    tmpstring += " Linecount = " + to_string(linecount+1);
+    introtext.push_back(tmpstring);
+
+    for(int i=0; i < linecount; i++)
+    {
+        cptr = introtext[i].c_str();
+        mvaddstr(halfy-(linecount/2)+i,halfx-introtext[i].length()/2,cptr);
+    }
+    //mvprintw(halfy,halfx,"linecount: %d\n", linecount);
+    //mvaddstr(halfy,halfx,"Wandurr! Press any key to begin:\n");
+    //printw("rows: %d cols: %d", rows, cols);
     getch();
     refresh();
 }
 
-void drawhelpscreen()
+void setuphelpwindow()
+{
+    if((helpwindow = newwin(0,0,0,0)) == NULL)
+    {
+       crash("Unable to allocate window memory!\n");
+    }
+}
+
+void drawhelpwindow()
 {
 }
 
@@ -191,7 +234,7 @@ void print2dvec(vector<vector<Cell>> pvec, string title)
 
 void drawgamescreen()
 {
-    int rowoffset = 1, coloffset = 1;
+    //int rowoffset = 1, coloffset = 1;
 
     for(row=2; row < rows; row++) {
         for(col=2; col < cols-3; col++) {
@@ -221,3 +264,13 @@ void drawgamescreen()
     refresh();
 }
 
+void crash(string msg)
+{
+    // USEFUL TIP: http://stackoverflow.com/a/347959
+    // also: http://stackoverflow.com/questions/1524356/c-deprecated-conversion-from-string-constant-to-char
+    const char * cptr = msg.c_str();
+    puts(cptr);
+    refresh();
+    endwin();
+    exit(1);
+}
