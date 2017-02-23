@@ -41,6 +41,7 @@ typedef struct
 } Creature;
             
 vector<vector<Cell> > gameworld;
+vector<string> helptext;
 WINDOW *helpwindow;
 
 void gamesetup();
@@ -60,11 +61,11 @@ int main(void)
     srand(timenow);
     //const int rows = 15, cols = 40;
 
-    (void) initscr();
+    initscr();
     keypad(stdscr, TRUE);
-    (void) nonl();
-    (void) cbreak();
-    (void) echo();
+    nonl();
+    cbreak();
+    echo();
 
     // game setup came from here
     gamesetup();
@@ -123,6 +124,10 @@ int main(void)
                 //addstr("Right\n");
                 if(playerx++ >= cols) playerx = cols;
                 break;
+            case '=':
+                addstr("Help F1\n");
+                refresh();
+                drawhelpwindow();
             default:
                 break;
         }
@@ -135,7 +140,7 @@ int main(void)
     return 0;
 }
 
-void gamesetup()
+void gamesetup(void)
 {
     curs_set(0);
     getmaxyx(stdscr,rows,cols);
@@ -190,14 +195,28 @@ void drawintroscreen()
 
 void setuphelpwindow()
 {
-    if((helpwindow = newwin(0,0,0,0)) == NULL)
+    if((helpwindow = newwin(halfy-5,halfx-15,5,30)) == NULL)
     {
        crash("Unable to allocate window memory!\n");
     }
+    mvwaddstr(helpwindow,0,10,"THIS IS THE HELP WINDOW");
+    mvwaddstr(helpwindow,6,10,"BEHOLD HOW HELPFUL IT IS");
+    mvwaddstr(helpwindow,8,10,"Press ENTER to return to game");
 }
 
 void drawhelpwindow()
 {
+    nodelay(stdscr, FALSE);
+    //wclear(stdscr);
+    touchwin(helpwindow);
+    wrefresh(helpwindow);
+    //mvaddstr(halfy-10,halfx,"drawhelpwindow() called\n");
+    refresh();
+    getch();
+    nodelay(stdscr, TRUE);
+    touchwin(stdscr);
+    refresh();
+    //touchwin(stdscr);
 }
 
 void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
