@@ -20,6 +20,7 @@ using namespace std;
 
 int row = 0, col = 0, rows = 0, cols = 0;
 int rowrequired = 0, colrequired = 0;
+int helpmaxy, helpmaxx, helphalfy, helphalfx;
 int playery = 0, playerx = 0, halfy = 0, halfx = 0;
 int score = 0;
 const int cpairs=7;
@@ -41,9 +42,10 @@ typedef struct
 } Creature;
             
 vector<vector<Cell> > gameworld;
-vector<string> helptext;
-WINDOW *helpwindow;
+vector<string> helptextleft, helptextright;
+WINDOW *helpwindowleft, *helpwindowright;
 
+void setuphelptext();
 void gamesetup();
 void drawintroscreen();
 void setuphelpwindow();
@@ -67,7 +69,7 @@ int main(void)
     cbreak();
     echo();
 
-    // game setup came from here
+    setuphelptext();
     gamesetup();
     drawintroscreen();
 
@@ -93,6 +95,7 @@ int main(void)
         init_pair(7, COLOR_WHITE, COLOR_WHITE);
         init_pair(8, COLOR_YELLOW, COLOR_GREEN);
         init_pair(9, COLOR_BLACK, COLOR_GREEN);
+        init_pair(10, COLOR_BLACK, COLOR_WHITE);
     }
 
     nodelay(stdscr, TRUE);
@@ -105,6 +108,9 @@ int main(void)
         ch = getch();
         switch(ch)
         {
+            // TODO: add code that shows the numeric value of the last key
+            // hit, so you can change ~ to ESC and = to F1
+
             // also, when player went out of bounds he sort of made a cool
             // "tunnelling" which could be good for a dig dug kinda game
             // or maybe an ant colony sim
@@ -124,8 +130,8 @@ int main(void)
                 //addstr("Right\n");
                 if(playerx++ >= cols) playerx = cols;
                 break;
-            case '=':
-                addstr("Help F1\n");
+            case '=': // CHANGE THIS TO F1 KEY
+                //addstr("Help F1\n");
                 refresh();
                 drawhelpwindow();
             default:
@@ -140,6 +146,26 @@ int main(void)
     return 0;
 }
 
+void setuphelptext()
+{
+    // we run setup help text so that later if we want to limit
+    // the game to not run if the window size is insufficient for
+    // this text, we will be able to calculate the numbers for that.
+
+    helptextleft.push_back("Wandurr");
+    helptextleft.push_back("--------------------------------------");
+    helptextleft.push_back(" ");
+    helptextleft.push_back("WELCOME TO THE HELP MENU hurr durr");
+    helptextleft.push_back("BEHOLD HOW HELPFUL IT IS hurr durr");
+    helptextleft.push_back(" ");
+    helptextleft.push_back("In Game:");
+    helptextleft.push_back("Use arrow keys to move.");
+    helptextleft.push_back("Pick up $ to increase score.");
+    helptextleft.push_back("press = for Help.");
+    helptextleft.push_back("press ~ to quit.");
+    helptextleft.push_back(" ");
+}
+
 void gamesetup(void)
 {
     curs_set(0);
@@ -151,6 +177,20 @@ void gamesetup(void)
     rows-=2;
     cols-=2;
     setuphelpwindow();
+    // DELETE next 3
+    //printw("helpmaxy: %d helpmaxx %d\n",helpmaxy,helpmaxx);
+    //refresh();
+    //getch();
+
+    // Magic numbers are not the way to do this, but I don't have time
+    // to calculate the minimum window size from the setuphelptext()
+    // vector helptextleft & helptextright.
+    if(rows < 24 || cols < 80)
+    {
+        endwin();
+        cout << "\n\nYour window is too small to play Wandurr.\nPlease make it bigger and try again.\n\n";
+        exit(1);
+    }
 }
 
 void drawintroscreen()
@@ -168,7 +208,7 @@ void drawintroscreen()
     introtext.push_back("In Game:\n");
     introtext.push_back("Use arrow keys to move.\n");
     introtext.push_back("Pick up $ to increase score.\n");
-    introtext.push_back("press F1 for Help.\n");
+    introtext.push_back("press = for Help.\n");
     introtext.push_back("press ~ to quit.\n");
     introtext.push_back("\n");
     introtext.push_back("PRESS ANY KEY TO BEGIN YOUR GLORIOUS\n");
@@ -195,21 +235,51 @@ void drawintroscreen()
 
 void setuphelpwindow()
 {
-    if((helpwindow = newwin(halfy-5,halfx-15,5,30)) == NULL)
+    int linecount;
+    string tmpstring;
+    const char *cptr;
+
+    //helptext.push_back("WELCOME TO THE HELP MENU\n");
+    //helptext.push_back("ENJOY YOUR STAY\n");
+    //helptext.push_back("\n");
+    linecount = helptextleft.size();
+
+    if((helpwindowleft = newwin(rows-6,halfx-3,3,3)) == NULL)
     {
        crash("Unable to allocate window memory!\n");
     }
-    mvwaddstr(helpwindow,0,10,"THIS IS THE HELP WINDOW");
-    mvwaddstr(helpwindow,6,10,"BEHOLD HOW HELPFUL IT IS");
-    mvwaddstr(helpwindow,8,10,"Press ENTER to return to game");
+    
+    getmaxyx(helpwindowleft,helpmaxy,helpmaxx);
+    helphalfy = helpmaxy/2;
+    helphalfx = helpmaxx/2;
+
+    //wattrset(helpwindow,COLOR_PAIR(10));
+    //move(0,0);
+    //for(int i=0;i < helpmaxy; i++)
+    //    for(int j=0; j < helpmaxx; j++)
+    //        mvwaddch(helpwindow,i,j,'0');
+    wbkgd(helpwindowleft,COLOR_PAIR(10));
+    wrefresh(helpwindowleft);
+
+    // comment these out after debugging
+    linecount++;
+    tmpstring = "Screensize = (" + to_string(helpmaxy) + "," + to_string(helpmaxx) + ")";
+    tmpstring += " Linecount = " + to_string(linecount+1);
+    helptextleft.push_back(tmpstring);
+
+    for(int i=0; i < linecount; i++)
+    {
+        cptr = helptextleft[i].c_str();
+        mvwaddstr(helpwindowleft,helphalfy-(linecount/2)+i,helphalfx-helptextleft[i].length()/2,cptr);
+    }
 }
 
 void drawhelpwindow()
 {
     nodelay(stdscr, FALSE);
     //wclear(stdscr);
-    touchwin(helpwindow);
-    wrefresh(helpwindow);
+    touchwin(helpwindowleft);
+    wrefresh(helpwindowleft);
     //mvaddstr(halfy-10,halfx,"drawhelpwindow() called\n");
     refresh();
     getch();
