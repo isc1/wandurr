@@ -18,8 +18,9 @@
 #include <string>
 using namespace std;
 
-int row = 0, col = 0, rows = 0, cols = 0, playery = 0, playerx = 0;
-int halfy = 0, halfx = 0;
+int row = 0, col = 0, rows = 0, cols = 0;
+int playery = 0, playerx = 0, halfy = 0, halfx = 0;
+int score = 0;
 const int cpairs=7;
 
 typedef struct {
@@ -36,7 +37,6 @@ void vec2dinitrandint(vector<vector<Cell>>& pvec, int rsize);
 void print2dvec(vector<vector<Cell>> pvec, string title);
 void drawgamescreen();
 void drawhelpscreen();
-static void finish(int sig);
 
 int main(void)
 {
@@ -47,9 +47,6 @@ int main(void)
     timenow = time(NULL);
     srand(timenow);
     //const int rows = 15, cols = 40;
-
-    // what the hell is this crap?  FIX IT!
-    (void) signal(SIGINT, finish);
 
     (void) initscr();
     keypad(stdscr, TRUE);
@@ -95,7 +92,7 @@ int main(void)
         init_pair(9, COLOR_BLACK, COLOR_GREEN);
     }
 
-    nodelay(stdscr, TRUE);
+    //nodelay(stdscr, TRUE);
     move(rows+1,0);
     addstr("Press any key to quit.\n");
     getch();
@@ -106,21 +103,24 @@ int main(void)
         ch = getch();
         switch(ch)
         {
+            // also, when player went out of bounds he sort of made a cool
+            // "tunnelling" which could be good for a dig dug kinda game
+            // or maybe an ant colony sim
             case KEY_DOWN:
                 //addstr("Down\n");
-                playery++;
+                if(playery++ >= rows) playery = rows;
                 break;
             case KEY_UP:
                 //addstr("Up\n");
-                playery--;
+                if(playery-- <= 0) playery = 0;
                 break;
             case KEY_LEFT:
                 //addstr("Left\n");
-                playerx--;
+                if(playerx-- <= 0) playerx = 0;
                 break;
             case KEY_RIGHT:
                 //addstr("Right\n");
-                playerx++;
+                if(playerx++ >= cols) playerx = cols;
                 break;
             default:
                 break;
@@ -131,7 +131,6 @@ int main(void)
                 
 
     endwin();
-    //finish(0);
     return 0;
 }
 
@@ -143,6 +142,7 @@ void vec2dinitrandint(vector<vector<Cell>>& pvec, int rsize)
         {
             // this is supposed to be green
             pvec[i][j].color = 2;
+            //pvec[i][j].occupant = rand()%52+65;
             if (rand()%100==1) pvec[i][j].occupant = '$';
             else pvec[i][j].occupant = ' ';
             // cout << "pvec[" << i << "][" << j << "] = " << pvec[i][j].color << "\n";
@@ -172,11 +172,9 @@ void drawgamescreen()
 
     for(row=2; row < rows; row++) {
         for(col=2; col < cols-3; col++) {
-            move(row+rowoffset,col+coloffset);
-            //attrset(COLOR_PAIR(rand()%7+1));
+            //move(row+rowoffset,col+coloffset);
+            move(row,col);
             attrset(COLOR_PAIR(vec2d[row][col].color));
-            //if (vec2d[row][col].color > 0) vec2d[row][col].color=vec2d[row][col].color-1;
-            //else vec2d[row][col].color =  rand()%cpairs;
             if(vec2d[row][col].occupant == '$')
                 attrset(COLOR_PAIR(8));
             else
@@ -184,20 +182,22 @@ void drawgamescreen()
 
             addch(vec2d[row][col].occupant);
         }
-        //napms(10);
     }
     attrset(COLOR_PAIR(9));
     move(playery,playerx);
     addch('X');
+    mvprintw(3,50,"occupant: %d", vec2d[playery][playerx].occupant);
+    if(vec2d[playery][playerx].occupant == '$')
+    {
+        score++;
+        vec2d[playery][playerx].occupant = ' ';
+        mvprintw(3,3,"Score: %d", score);
+    }
+    mvprintw(3,3,"Score: %d", score);
+    mvprintw(3,15,"playery: %d  playerx: %d   ", playery, playerx);
     refresh();
 }
 
 void drawhelpscreen()
 {
-}
-
-static void finish(int sig)
-{
-    endwin();
-    exit(0);
 }
