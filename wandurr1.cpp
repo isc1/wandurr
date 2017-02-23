@@ -18,16 +18,24 @@
 #include <string>
 using namespace std;
 
-void vec2dinitrandint(vector<vector<int>>& pvec, int rsize);
-void print2dvec(vector<vector<int>> pvec, string title);
-void drawgamescreen();
-void drawhelpscreen();
-
-static void finish(int sig);
-
 int row = 0, col = 0, rows = 0, cols = 0;
 const int cpairs=7;
-vector<vector<int> > vec2d;
+
+typedef struct {
+    char    occupant;
+    int     y;
+    int     x;
+    char    color;
+} Cell;
+
+            
+vector<vector<Cell> > vec2d;
+
+void vec2dinitrandint(vector<vector<Cell>>& pvec, int rsize);
+void print2dvec(vector<vector<Cell>> pvec, string title);
+void drawgamescreen();
+void drawhelpscreen();
+static void finish(int sig);
 
 int main(void)
 {
@@ -38,14 +46,14 @@ int main(void)
     srand(timenow);
     //const int rows = 15, cols = 40;
 
+    // what the hell is this crap?  FIX IT!
     (void) signal(SIGINT, finish);
+
     (void) initscr();
     keypad(stdscr, TRUE);
     (void) nonl();
     (void) cbreak();
     (void) echo();
-
-    initscr();
 
     addstr("Wandurr! Press any key to begin:\n");
     curs_set(0);
@@ -98,27 +106,35 @@ int main(void)
     return 0;
 }
 
-void vec2dinitrandint(vector<vector<int>>& pvec, int rsize)
+void vec2dinitrandint(vector<vector<Cell>>& pvec, int rsize)
 {
-        for (unsigned int i = 0; i < pvec.size(); i++) {
-                    for (unsigned int j = 0; j < pvec[i].size(); j++) {
-                                    pvec[i][j] = rand()%rsize;
-                                                // cout << "pvec[" << i << "][" << j << "] = " << pvec[i][j] << "\n";
-                                            }
-                        }
+    for (unsigned int i = 0; i < pvec.size(); i++)
+    {
+        for (unsigned int j = 0; j < pvec[i].size(); j++)
+        {
+            // this is supposed to be green
+            pvec[i][j].color = 1;
+            if (rand()%100==1) pvec[i][j].occupant = '$';
+            else pvec[i][j].occupant = ' ';
+            // cout << "pvec[" << i << "][" << j << "] = " << pvec[i][j].color << "\n";
+        }
+    }
 }
 
-void print2dvec(vector<vector<int>> pvec, string title)
+void print2dvec(vector<vector<Cell>> pvec, string title)
 {
     // TODO: change this crap to use ncurses instead of cout!!! or just delete this?
-        // print out the 2d vector of int passed in as pvec
-        cout << "\n" << title << "\n";
-            for (unsigned int i = 0; i < pvec.size(); i++) {
-                        for (unsigned int j = 0; j < pvec[i].size(); j++)
-                                        cout << pvec[i][j] << " ";
-                                cout << "\n";
-                                    }
-                cout << "\n";
+    // print out the 2d vector of int passed in as pvec
+    cout << "\n" << title << "\n";
+    for (unsigned int i = 0; i < pvec.size(); i++)
+    {
+        for (unsigned int j = 0; j < pvec[i].size(); j++)
+        {
+            cout << pvec[i][j].color << " ";
+        }
+        cout << "\n";
+    }
+    cout << "\n";
 }
 
 void drawgamescreen()
@@ -127,15 +143,14 @@ void drawgamescreen()
 
     for(row=2; row < rows; row++) {
         for(col=2; col < cols-3; col++) {
-            //            
             move(row+rowoffset,col+coloffset);
             //attrset(COLOR_PAIR(rand()%7+1));
-            attrset(COLOR_PAIR(vec2d[row][col]+1));
-            if (vec2d[row][col] > 0) vec2d[row][col]=vec2d[row][col]-1;
-            else vec2d[row][col] =  rand()%cpairs;
-            addch(' ');
+            attrset(COLOR_PAIR(vec2d[row][col].color+1));
+            //if (vec2d[row][col].color > 0) vec2d[row][col].color=vec2d[row][col].color-1;
+            //else vec2d[row][col].color =  rand()%cpairs;
+            addch(vec2d[row][col].occupant);
         }
-        napms(10);
+        //napms(10);
         refresh();
     }
 }
