@@ -2,7 +2,17 @@
 *.slo
 *.lo
 *.o
+*.a
+*.so
 *.obj
+
+# Folders
+_obj
+_test
+
+# Architecture specific extensions/prefixes
+*.[568vq]
+[568vq].out
 
 # Precompiled Headers
 *.gch
@@ -27,3 +37,38 @@
 *.exe
 *.out
 *.app
+*.test
+*.prof
+*.ttf
+*.swp
+
+# go stuff?
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+_testmain.go
+
+# isc1: my custom ignores
+core
+
+# isc1: these are names I commonly use for junk files
+blarg
+blarg.txt
+random
+random.txt
+tmp
+tmp.txt
+tmp1
+tmp1.txt
+tmp2
+tmp2.txt
+tmp1out
+tmp1out.txt
+tmp2out
+tmp2out.txt
+zarg
+zarg.txt
+zargwarg
+zargwarg.txt
