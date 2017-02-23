@@ -30,13 +30,23 @@ typedef struct {
     char    color;
 } Cell;
 
+typedef struct
+{
+    int         id;
+    string      name;
+    int         row;
+    int         col;
+    int         coins;
+} Creature;
             
-vector<vector<Cell> > vec2d;
+vector<vector<Cell> > gameworld;
 
-void vec2dinitrandint(vector<vector<Cell>>& pvec, int rsize);
-void print2dvec(vector<vector<Cell>> pvec, string title);
-void drawgamescreen();
+void gamesetup();
+void drawintroscreen();
 void drawhelpscreen();
+void drawgamescreen();
+void gameworldinit(vector<vector<Cell>>& pvec, int rsize);
+void print2dvec(vector<vector<Cell>> pvec, string title);
 
 int main(void)
 {
@@ -54,25 +64,15 @@ int main(void)
     (void) cbreak();
     (void) echo();
 
-    addstr("Wandurr! Press any key to begin:\n");
-    curs_set(0);
-    getmaxyx(stdscr,rows,cols);
-    halfy = rows/2;
-    halfx = cols/2;
-    playery = halfy;
-    playerx = halfx;
-    rows-=2;
-    cols-=2;
-    printw("rows: %d cols: %d", rows, cols);
-    refresh();
-    getch();
+    // game setup came from here
+    gamesetup();
+    drawintroscreen();
 
-//    vector<vector<int> > vec2d;
-    vec2d.resize(rows);
+    gameworld.resize(rows);
     for (int i = 0; i < rows; ++i)
-        vec2d[i].resize(cols);
-    vec2dinitrandint(vec2d, cpairs);
-    //print2dvec(vec2d, "vec2d");
+        gameworld[i].resize(cols);
+    gameworldinit(gameworld, cpairs);
+    //print2dvec(gameworld, "gameworld");
 
     if (has_colors())
     {
@@ -92,10 +92,9 @@ int main(void)
         init_pair(9, COLOR_BLACK, COLOR_GREEN);
     }
 
-    //nodelay(stdscr, TRUE);
+    nodelay(stdscr, TRUE);
     move(rows+1,0);
-    addstr("Press any key to quit.\n");
-    getch();
+    addstr("Press ~ to quit.\n");
 
     keypad(stdscr, TRUE);
     do
@@ -134,7 +133,31 @@ int main(void)
     return 0;
 }
 
-void vec2dinitrandint(vector<vector<Cell>>& pvec, int rsize)
+void gamesetup()
+{
+    curs_set(0);
+    getmaxyx(stdscr,rows,cols);
+    halfy = rows/2;
+    halfx = cols/2;
+    playery = halfy;
+    playerx = halfx;
+    rows-=2;
+    cols-=2;
+}
+
+void drawintroscreen()
+{
+    mvaddstr(halfy,halfx,"Wandurr! Press any key to begin:\n");
+    printw("rows: %d cols: %d", rows, cols);
+    getch();
+    refresh();
+}
+
+void drawhelpscreen()
+{
+}
+
+void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
 {
     for (unsigned int i = 0; i < pvec.size(); i++)
     {
@@ -174,23 +197,23 @@ void drawgamescreen()
         for(col=2; col < cols-3; col++) {
             //move(row+rowoffset,col+coloffset);
             move(row,col);
-            attrset(COLOR_PAIR(vec2d[row][col].color));
-            if(vec2d[row][col].occupant == '$')
+            attrset(COLOR_PAIR(gameworld[row][col].color));
+            if(gameworld[row][col].occupant == '$')
                 attrset(COLOR_PAIR(8));
             else
                 attrset(COLOR_PAIR(2));
 
-            addch(vec2d[row][col].occupant);
+            addch(gameworld[row][col].occupant);
         }
     }
     attrset(COLOR_PAIR(9));
     move(playery,playerx);
     addch('X');
-    mvprintw(3,50,"occupant: %d", vec2d[playery][playerx].occupant);
-    if(vec2d[playery][playerx].occupant == '$')
+    mvprintw(3,50,"occupant: %d", gameworld[playery][playerx].occupant);
+    if(gameworld[playery][playerx].occupant == '$')
     {
         score++;
-        vec2d[playery][playerx].occupant = ' ';
+        gameworld[playery][playerx].occupant = ' ';
         mvprintw(3,3,"Score: %d", score);
     }
     mvprintw(3,3,"Score: %d", score);
@@ -198,6 +221,3 @@ void drawgamescreen()
     refresh();
 }
 
-void drawhelpscreen()
-{
-}
