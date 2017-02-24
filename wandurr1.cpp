@@ -3,6 +3,8 @@
 // This program is covered by the MIT License.
 // See the file LICENSE included with this distribution for terms.
 
+// *** REMEMBER TO CHANGE VERSION BEFORE git push ***
+
 // see the file README.md for more information, including how to compile and
 // run this program.
 
@@ -152,9 +154,10 @@ void setuphelptext()
     // the game to not run if the window size is insufficient for
     // this text, we will be able to calculate the numbers for that.
 
-    helptextleft.push_back("Wandurr");
-    helptextleft.push_back("--------------------------------------");
-    helptextleft.push_back(" ");
+    // VERSION
+    helptextleft.push_back("Wandurr1 v170224a");
+    //helptextleft.push_back("--------------------------------------");
+    //helptextleft.push_back(" ");
     helptextleft.push_back("WELCOME TO THE HELP MENU hurr durr");
     helptextleft.push_back("BEHOLD HOW HELPFUL IT IS hurr durr");
     helptextleft.push_back(" ");
@@ -188,7 +191,10 @@ void gamesetup(void)
     if(rows < 24 || cols < 80)
     {
         endwin();
-        cout << "\n\nYour window is too small to play Wandurr.\nPlease make it bigger and try again.\n\n";
+        cout << "\n=============================================\n";
+        cout << "= Your window is too small to play Wandurr. =\n";
+        cout << "=    Please make it bigger and try again.   =\n";
+        cout << "=============================================\n\n";
         exit(1);
     }
 }
@@ -201,7 +207,7 @@ void drawintroscreen()
     
     vector<string> introtext;
     introtext.push_back("WANDURR1\n");
-    introtext.push_back("-------------------------------------\n");
+    //introtext.push_back("-------------------------------------\n");
     introtext.push_back("AN AMAZING GAME OF\n");
     introtext.push_back("WALKING AROUND AND STUFF hurr durr\n");
     introtext.push_back("\n");
@@ -211,12 +217,16 @@ void drawintroscreen()
     introtext.push_back("press = for Help.\n");
     introtext.push_back("press ~ to quit.\n");
     introtext.push_back("\n");
-    introtext.push_back("PRESS ANY KEY TO BEGIN YOUR GLORIOUS\n");
-    introtext.push_back("ADVENTURE OF SUPREME 3D VR INTENSITY\n");
+    introtext.push_back("Press any key to begin!\n");
+    //introtext.push_back("GLORIOUS ADVENTURE OF SUPREME\n");
+    //introtext.push_back("COMPUTER GAME INTENSITY\n");
     introtext.push_back("\n");
     linecount = introtext.size();
     // comment these out after debugging
     linecount++;
+
+    // Nice review of string concatenation options:
+    // http://stackoverflow.com/a/900035
     tmpstring = "Screensize = (" + to_string(rows) + "," + to_string(cols) + ")";
     tmpstring += " Linecount = " + to_string(linecount+1);
     introtext.push_back(tmpstring);
