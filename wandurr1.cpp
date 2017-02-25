@@ -3,10 +3,11 @@
 // This program is covered by the MIT License.
 // See the file LICENSE included with this distribution for terms.
 
-// *** REMEMBER TO CHANGE VERSION BEFORE git push ***
-
-// see the file README.md for more information, including how to compile and
+// This source code can be downloaded at https://github.com/isc1/wandurr
+// See the file README.md for more information, including how to compile and
 // run this program.
+
+// *** REMEMBER TO CHANGE VERSION BEFORE git push ***
 
 // wandurr1 does not use classes, so this code will look more C-like.  I may do
 // a wandurr2 that uses classes.
@@ -47,64 +48,49 @@ vector<vector<Cell> > gameworld;
 vector<string> helptextleft, helptextright;
 WINDOW *helpwindowleft, *helpwindowright;
 
+void setupcolorpairs();
 void setuphelptext();
-void gamesetup();
-void drawintroscreen();
 void setuphelpwindow();
-void drawhelpwindow();
-void drawgamescreen();
 void gameworldinit(vector<vector<Cell>>& pvec, int rsize);
 void print2dvec(vector<vector<Cell>> pvec, string title);
+void setupUI();
+void drawintroscreen();
+void drawhelpwindow();
+void drawgamescreen();
 void crash(string msg);
 
 int main(void)
 {
+    // seed random number generator
     int ch = 0;
     time_t timenow;
     timenow = time(NULL);
     srand(timenow);
-    //const int rows = 15, cols = 40;
 
+    // Do initial ncurses setup
+    // (I'd like to put this in it's own function to clean up main
+    // but I think I had some weird problems when I tried that...)
     initscr();
     keypad(stdscr, TRUE);
     nonl();
     cbreak();
     echo();
+    keypad(stdscr, TRUE);
 
-    setuphelptext();
-    gamesetup();
+    // Setup the UI and display the welcome message
+    setupUI();
     drawintroscreen();
 
+    // Turn nodelay on AFTER intro screen is done
+    nodelay(stdscr, TRUE);
+
+    // Initialize the gameworld
     gameworld.resize(rows);
     for (int i = 0; i < rows; ++i)
         gameworld[i].resize(cols);
     gameworldinit(gameworld, cpairs);
-    //print2dvec(gameworld, "gameworld");
 
-    if (has_colors())
-    {
-        //addstr("has_colors()\n");
-        refresh();
-        //getch();
-        start_color();
-        init_pair(0, COLOR_WHITE, COLOR_BLACK);
-        init_pair(1, COLOR_WHITE, COLOR_RED);
-        init_pair(2, COLOR_WHITE, COLOR_GREEN);
-        init_pair(3, COLOR_WHITE, COLOR_YELLOW);
-        init_pair(4, COLOR_WHITE, COLOR_BLUE);
-        init_pair(5, COLOR_WHITE, COLOR_MAGENTA);
-        init_pair(6, COLOR_WHITE, COLOR_CYAN);
-        init_pair(7, COLOR_WHITE, COLOR_WHITE);
-        init_pair(8, COLOR_YELLOW, COLOR_GREEN);
-        init_pair(9, COLOR_BLACK, COLOR_GREEN);
-        init_pair(10, COLOR_BLACK, COLOR_WHITE);
-    }
-
-    nodelay(stdscr, TRUE);
-    move(rows+1,0);
-    addstr("Press ~ to quit.\n");
-
-    keypad(stdscr, TRUE);
+    // Main Game Loop
     do
     {
         ch = getch();
@@ -142,10 +128,25 @@ int main(void)
         drawgamescreen();
         refresh();
     } while(ch != '~');
-                
 
     endwin();
     return 0;
+}
+
+void setupcolorpairs()
+{
+    start_color();
+    init_pair(0, COLOR_WHITE, COLOR_BLACK);
+    init_pair(1, COLOR_WHITE, COLOR_RED);
+    init_pair(2, COLOR_WHITE, COLOR_GREEN);
+    init_pair(3, COLOR_WHITE, COLOR_YELLOW);
+    init_pair(4, COLOR_WHITE, COLOR_BLUE);
+    init_pair(5, COLOR_WHITE, COLOR_MAGENTA);
+    init_pair(6, COLOR_WHITE, COLOR_CYAN);
+    init_pair(7, COLOR_WHITE, COLOR_WHITE);
+    init_pair(8, COLOR_YELLOW, COLOR_GREEN);
+    init_pair(9, COLOR_BLACK, COLOR_GREEN);
+    init_pair(10, COLOR_BLACK, COLOR_WHITE);
 }
 
 void setuphelptext()
@@ -155,9 +156,7 @@ void setuphelptext()
     // this text, we will be able to calculate the numbers for that.
 
     // VERSION
-    helptextleft.push_back("Wandurr1 v170224a");
-    //helptextleft.push_back("--------------------------------------");
-    //helptextleft.push_back(" ");
+    helptextleft.push_back("-=Wandurr1 v170224b=-");
     helptextleft.push_back("WELCOME TO THE HELP MENU hurr durr");
     helptextleft.push_back("BEHOLD HOW HELPFUL IT IS hurr durr");
     helptextleft.push_back(" ");
@@ -167,80 +166,6 @@ void setuphelptext()
     helptextleft.push_back("press = for Help.");
     helptextleft.push_back("press ~ to quit.");
     helptextleft.push_back(" ");
-}
-
-void gamesetup(void)
-{
-    curs_set(0);
-    getmaxyx(stdscr,rows,cols);
-    halfy = rows/2;
-    halfx = cols/2;
-    playery = halfy;
-    playerx = halfx;
-    rows-=2;
-    cols-=2;
-    setuphelpwindow();
-    // DELETE next 3
-    //printw("helpmaxy: %d helpmaxx %d\n",helpmaxy,helpmaxx);
-    //refresh();
-    //getch();
-
-    // Magic numbers are not the way to do this, but I don't have time
-    // to calculate the minimum window size from the setuphelptext()
-    // vector helptextleft & helptextright.
-    if(rows < 24 || cols < 80)
-    {
-        endwin();
-        cout << "\n=============================================\n";
-        cout << "= Your window is too small to play Wandurr. =\n";
-        cout << "=    Please make it bigger and try again.   =\n";
-        cout << "=============================================\n\n";
-        exit(1);
-    }
-}
-
-void drawintroscreen()
-{
-    int linecount;
-    string tmpstring;
-    const char *cptr;
-    
-    vector<string> introtext;
-    introtext.push_back("WANDURR1\n");
-    //introtext.push_back("-------------------------------------\n");
-    introtext.push_back("AN AMAZING GAME OF\n");
-    introtext.push_back("WALKING AROUND AND STUFF hurr durr\n");
-    introtext.push_back("\n");
-    introtext.push_back("In Game:\n");
-    introtext.push_back("Use arrow keys to move.\n");
-    introtext.push_back("Pick up $ to increase score.\n");
-    introtext.push_back("press = for Help.\n");
-    introtext.push_back("press ~ to quit.\n");
-    introtext.push_back("\n");
-    introtext.push_back("Press any key to begin!\n");
-    //introtext.push_back("GLORIOUS ADVENTURE OF SUPREME\n");
-    //introtext.push_back("COMPUTER GAME INTENSITY\n");
-    introtext.push_back("\n");
-    linecount = introtext.size();
-    // comment these out after debugging
-    linecount++;
-
-    // Nice review of string concatenation options:
-    // http://stackoverflow.com/a/900035
-    tmpstring = "Screensize = (" + to_string(rows) + "," + to_string(cols) + ")";
-    tmpstring += " Linecount = " + to_string(linecount+1);
-    introtext.push_back(tmpstring);
-
-    for(int i=0; i < linecount; i++)
-    {
-        cptr = introtext[i].c_str();
-        mvaddstr(halfy-(linecount/2)+i,halfx-introtext[i].length()/2,cptr);
-    }
-    //mvprintw(halfy,halfx,"linecount: %d\n", linecount);
-    //mvaddstr(halfy,halfx,"Wandurr! Press any key to begin:\n");
-    //printw("rows: %d cols: %d", rows, cols);
-    getch();
-    refresh();
 }
 
 void setuphelpwindow()
@@ -284,19 +209,39 @@ void setuphelpwindow()
     }
 }
 
-void drawhelpwindow()
+void setupUI(void)
 {
-    nodelay(stdscr, FALSE);
-    //wclear(stdscr);
-    touchwin(helpwindowleft);
-    wrefresh(helpwindowleft);
-    //mvaddstr(halfy-10,halfx,"drawhelpwindow() called\n");
-    refresh();
-    getch();
-    nodelay(stdscr, TRUE);
-    touchwin(stdscr);
-    refresh();
-    //touchwin(stdscr);
+    curs_set(0);
+    getmaxyx(stdscr,rows,cols);
+    halfy = rows/2;
+    halfx = cols/2;
+    playery = halfy;
+    playerx = halfx;
+    rows-=2;
+    cols-=2;
+    if(has_colors())
+        setupcolorpairs();
+    else
+        crash("Your terminal does not support color, sorry!\n");
+    setuphelptext();
+    setuphelpwindow();
+    // DELETE next 3
+    //printw("helpmaxy: %d helpmaxx %d\n",helpmaxy,helpmaxx);
+    //refresh();
+    //getch();
+
+    // Magic numbers are not the way to do this, but I don't have time
+    // to calculate the minimum window size from the setuphelptext()
+    // vector helptextleft & helptextright.
+    if(rows < 24 || cols < 80)
+    {
+        endwin();
+        cout << "\n=============================================\n";
+        cout << "= Your window is too small to play Wandurr. =\n";
+        cout << "=    Please make it bigger and try again.   =\n";
+        cout << "=============================================\n\n";
+        exit(1);
+    }
 }
 
 void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
@@ -317,6 +262,7 @@ void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
 
 void print2dvec(vector<vector<Cell>> pvec, string title)
 {
+    // diagnostic function.  this doesn't normally get called.
     // TODO: change this crap to use ncurses instead of cout!!! or just delete this?
     // print out the 2d vector of int passed in as pvec
     cout << "\n" << title << "\n";
@@ -331,9 +277,66 @@ void print2dvec(vector<vector<Cell>> pvec, string title)
     cout << "\n";
 }
 
+void drawintroscreen()
+{
+    int linecount;
+    string tmpstring;
+    const char *cptr;
+    
+    vector<string> introtext;
+    introtext.push_back("-=WANDURR1=-\n");
+    introtext.push_back("AN AMAZING GAME OF\n");
+    introtext.push_back("WALKING AROUND AND STUFF hurr durr\n");
+    introtext.push_back("\n");
+    introtext.push_back("In Game:\n");
+    introtext.push_back("Use arrow keys to move.\n");
+    introtext.push_back("Pick up $ to increase score.\n");
+    introtext.push_back("press = for Help.\n");
+    introtext.push_back("press ~ to quit.\n");
+    introtext.push_back("\n");
+    introtext.push_back("Press any key to begin!\n");
+    //introtext.push_back("GLORIOUS ADVENTURE OF SUPREME\n");
+    //introtext.push_back("COMPUTER GAME INTENSITY\n");
+    introtext.push_back("\n");
+    linecount = introtext.size();
+    // comment these out after debugging
+    linecount++;
+
+    // Nice review of string concatenation options:
+    // http://stackoverflow.com/a/900035
+    tmpstring = "Screensize = (" + to_string(rows) + "," + to_string(cols) + ")";
+    tmpstring += " Linecount = " + to_string(linecount+1);
+    introtext.push_back(tmpstring);
+
+    for(int i=0; i < linecount; i++)
+    {
+        cptr = introtext[i].c_str();
+        mvaddstr(halfy-(linecount/2)+i,halfx-introtext[i].length()/2,cptr);
+    }
+    //mvprintw(halfy,halfx,"linecount: %d\n", linecount);
+    //mvaddstr(halfy,halfx,"Wandurr! Press any key to begin:\n");
+    //printw("rows: %d cols: %d", rows, cols);
+    refresh();
+    getch();
+    nodelay(stdscr, TRUE);
+}
+
+void drawhelpwindow()
+{
+    nodelay(stdscr, FALSE);
+    touchwin(helpwindowleft);
+    wrefresh(helpwindowleft);
+    //mvaddstr(halfy-10,halfx,"drawhelpwindow() called\n");
+    refresh();
+    getch();
+    nodelay(stdscr, TRUE);
+    touchwin(stdscr);
+    refresh();
+}
+
 void drawgamescreen()
 {
-    //int rowoffset = 1, coloffset = 1;
+    // ADD "Press ~ to quit" MSG PROMINENTLY ON SCREEN
 
     for(row=2; row < rows; row++) {
         for(col=2; col < cols-3; col++) {
