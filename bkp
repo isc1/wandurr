@@ -31,29 +31,23 @@ typedef struct
 {
     int         id;
     string      name;
-    char        icon;
     int         row;
     int         col;
-    int         rowprev;
-    int         colprev;
     int         coins;
 } Creature;
             
 int row = 0, col = 0, rows = 0, cols = 0;
 int rowrequired = 0, colrequired = 0;
-int rowoffset = 2, coloffset = 2;
-int helpmaxrow, helpmaxcol, helphalfrow, helphalfcol;
-int halfrow = 0, halfcol = 0;
-unsigned int creaturecount = 10;
+int helpmaxrow, helpmaxcol, helphalfcol, helphalfcol;
+int halfy = 0, halfx = 0;
 int score = 0;
-// REMEMBER TO UPDATE cpairs WHEN YOU ADD COLORS hurr durr
-const int cpairs=10;
+const int cpairs=7;
 
 vector<vector<Cell> > gameworld;
 vector<string> helptextleft, helptextright;
 WINDOW *helpwindowleft, *helpwindowright;
 Creature player;
-vector<Creature> creatures;
+queue<Creature> creatures;
 
 // Function Prototypes
 void setupcolorpairs();
@@ -83,7 +77,6 @@ int main(void)
     nonl();
     cbreak();
     echo();
-    // TODO: remove one of these keypad funcs, which one?
     keypad(stdscr, TRUE);
 
     // Setup the UI and display the welcome message
@@ -112,18 +105,23 @@ int main(void)
             // "tunnelling" which could be good for a dig dug kinda game
             // or maybe an ant colony sim
             case KEY_DOWN:
-                if(player.row < rows-1) player.row++;
+                //addstr("Down\n");
+                if(player.row++ >= rows) player.row = rows;
                 break;
             case KEY_UP:
-                if(player.row > 0) player.row--;
+                //addstr("Up\n");
+                if(player.row-- <= 0) player.row = 0;
                 break;
             case KEY_LEFT:
-                if(player.col > 0) player.col--;
+                //addstr("Left\n");
+                if(player.col-- <= 0) player.col = 0;
                 break;
             case KEY_RIGHT:
-                if(player.col < cols-1) player.col++;
+                //addstr("Right\n");
+                if(player.col++ >= cols) player.col = cols;
                 break;
             case '=': // CHANGE THIS TO F1 KEY
+                //addstr("Help F1\n");
                 refresh();
                 drawhelpwindow();
             default:
@@ -131,7 +129,6 @@ int main(void)
         }
         drawgamescreen();
         refresh();
-        napms(50);
     } while(ch != '~');
 
     endwin();
@@ -184,13 +181,13 @@ void setuphelpwindow()
     //helptext.push_back("\n");
     linecount = helptextleft.size();
 
-    if((helpwindowleft = newwin(rows-6,halfcol-3,3,3)) == NULL)
+    if((helpwindowleft = newwin(rows-6,halfx-3,3,3)) == NULL)
     {
        crash("Unable to allocate window memory!\n");
     }
     
     getmaxyx(helpwindowleft,helpmaxrow,helpmaxcol);
-    helphalfrow = helpmaxrow/2;
+    helphalfcol = helpmaxrow/2;
     helphalfcol = helpmaxcol/2;
 
     //wattrset(helpwindow,COLOR_PAIR(10));
@@ -210,7 +207,7 @@ void setuphelpwindow()
     for(int i=0; i < linecount; i++)
     {
         cptr = helptextleft[i].c_str();
-        mvwaddstr(helpwindowleft,helphalfrow-(linecount/2)+i,helphalfcol-helptextleft[i].length()/2,cptr);
+        mvwaddstr(helpwindowleft,helphalfcol-(linecount/2)+i,helphalfcol-helptextleft[i].length()/2,cptr);
     }
 }
 
@@ -218,10 +215,10 @@ void setupUI(void)
 {
     curs_set(0);
     getmaxyx(stdscr,rows,cols);
-    halfrow = rows/2;
-    halfcol = cols/2;
-    player.row = halfrow;
-    player.col = halfcol;
+    halfy = rows/2;
+    halfx = cols/2;
+    player.row = halfy;
+    player.col = halfx;
     rows-=2;
     cols-=2;
     if(has_colors())
@@ -262,22 +259,6 @@ void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
             else pvec[i][j].occupant = ' ';
             // cout << "pvec[" << i << "][" << j << "] = " << pvec[i][j].color << "\n";
         }
-    }
-
-    Creature tmpcreature;
-    tmpcreature.id = 0;
-    tmpcreature.name = "CLYDE";
-    tmpcreature.icon = '*';
-    tmpcreature.row = 0;
-    tmpcreature.col = 0;
-    tmpcreature.coins = 0;
-    for (unsigned int i = 0; i < creaturecount; i++)
-    {
-        tmpcreature.row = rand()%(rows-rowoffset);
-        tmpcreature.col = rand()%(cols-coloffset);
-        tmpcreature.rowprev = tmpcreature.row;
-        tmpcreature.colprev = tmpcreature.col;
-        creatures.push_back(tmpcreature);
     }
 }
 
@@ -332,10 +313,10 @@ void drawintroscreen()
     for(int i=0; i < linecount; i++)
     {
         cptr = introtext[i].c_str();
-        mvaddstr(halfrow-(linecount/2)+i,halfcol-introtext[i].length()/2,cptr);
+        mvaddstr(halfy-(linecount/2)+i,halfx-introtext[i].length()/2,cptr);
     }
-    //mvprintw(halfrow,halfcol,"linecount: %d\n", linecount);
-    //mvaddstr(halfrow,halfcol,"Wandurr! Press any key to begin:\n");
+    //mvprintw(halfy,halfx,"linecount: %d\n", linecount);
+    //mvaddstr(halfy,halfx,"Wandurr! Press any key to begin:\n");
     //printw("rows: %d cols: %d", rows, cols);
     refresh();
     getch();
@@ -347,7 +328,7 @@ void drawhelpwindow()
     nodelay(stdscr, FALSE);
     touchwin(helpwindowleft);
     wrefresh(helpwindowleft);
-    //mvaddstr(halfrow-10,halfcol,"drawhelpwindow() called\n");
+    //mvaddstr(halfy-10,halfx,"drawhelpwindow() called\n");
     refresh();
     getch();
     nodelay(stdscr, TRUE);
@@ -359,33 +340,8 @@ void drawgamescreen()
 {
     // ADD "Press ~ to quit" MSG PROMINENTLY ON SCREEN
 
-    // TODO: you don't need to update this every game tick.  just do it once
-    // at screen setup or whatever
-
-    for(unsigned int i=0; i<creaturecount; i++)
-    {
-        int rowmod = rand()%3-1;
-        int colmod = rand()%3-1;
-
-        //mvaddch(creatures[i].row, creatures[i].col, ' ');
-        creatures[i].rowprev = creatures[i].row;
-        creatures[i].colprev = creatures[i].col;
-        creatures[i].row += rowmod;
-        creatures[i].col += colmod;
-        if(creatures[i].row <0) creatures[i].row=0;
-        if(creatures[i].row > rows-rowoffset) creatures[i].row=rows-rowoffset;
-        if(creatures[i].col <0) creatures[i].col=0;
-        if(creatures[i].col > cols-coloffset) creatures[i].col=cols-coloffset;
-        gameworld[creatures[i].row][creatures[i].col].occupant =  creatures[i].icon;
-        gameworld[creatures[i].rowprev][creatures[i].colprev].occupant =  ' ';
-
-        //creatures[i].row = rand()%rows-rowoffset;
-        //creatures[i].col = rand()%cols-coloffset;
-        //mvaddch(creatures[i].row, creatures[i].col, creatures[i].icon);
-    }
-    
-    for(row=rowoffset; row < rows; row++) {
-        for(col=coloffset; col < cols-3; col++) {
+    for(row=2; row < rows; row++) {
+        for(col=2; col < cols-3; col++) {
             //move(row+rowoffset,col+coloffset);
             move(row,col);
             attrset(COLOR_PAIR(gameworld[row][col].color));
@@ -397,11 +353,9 @@ void drawgamescreen()
             addch(gameworld[row][col].occupant);
         }
     }
-
     attrset(COLOR_PAIR(9));
     move(player.row,player.col);
     addch('X');
-
     mvprintw(3,50,"occupant: %d", gameworld[player.row][player.col].occupant);
     if(gameworld[player.row][player.col].occupant == '$')
     {
@@ -411,7 +365,6 @@ void drawgamescreen()
     }
     mvprintw(3,3,"Score: %d", score);
     mvprintw(3,15,"player.row: %d  player.col: %d   ", player.row, player.col);
-    mvprintw(4,5,"rows,cols: %d,%d  ",rows,cols);
     refresh();
 }
 
