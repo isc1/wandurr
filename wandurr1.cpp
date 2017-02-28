@@ -36,6 +36,8 @@ typedef struct
     int         col;
     int         rowprev;
     int         colprev;
+    //time        curtime;
+    //time        futuretime;
     int         coins;
 } Creature;
             
@@ -175,6 +177,10 @@ void setuphelptext()
 
 void setuphelpwindow()
 {
+    // you know, you really ought to create a generic window display
+    // function, and use it for the intro screen, the help screens
+    // and whatever other popup info this program uses.
+
     int linecount;
     string tmpstring;
     const char *cptr;
@@ -361,6 +367,20 @@ void drawgamescreen()
 
     // TODO: you don't need to update this every game tick.  just do it once
     // at screen setup or whatever
+
+    // TODO TODO TODO TODO TODO
+    // i'm pretty sure this creature shit should not be in drawgamescreen.
+    // there should be a separate thing that modifies the game world, and
+    // drawgamescreen should only read from that, never write to it...
+
+    // ALSO: in terms of sleeping the creatures so they don't move every
+    // gametick, you need to build a scheduler based on clock_gettime()
+    // there are examples of this in the c & cpp dirs, but see this file:
+    // code/lrn/cpp/clockgettime.c 
+    // see also:
+    // http://www.catb.org/esr/time-programming/
+    // http://pubs.opengroup.org/onlinepubs/7908799/xsh/time.h.html
+    // https://www.gnu.org/software/libc/manual/html_node/Date-and-Time.html#Date-and-Time
 
     for(unsigned int i=0; i<creaturecount; i++)
     {
