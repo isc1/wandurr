@@ -144,7 +144,6 @@ int main(void)
         }
         drawgamescreen();
         refresh();
-        napms(50);
     } while(ch != '~');
 
     endwin();
