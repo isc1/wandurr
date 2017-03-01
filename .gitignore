@@ -54,6 +54,13 @@ _testmain.go
 core
 
 # isc1: these are names I commonly use for junk files
+bkp
+bkp.txt
+bkp.c
+bkp.cpp
+bkp.bmp
+bkp.jpg
+bkp.md
 blarg
 blarg.txt
 random
