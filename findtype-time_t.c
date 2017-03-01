@@ -1,5 +1,10 @@
 // findtype-time_t.c -- discover the current systems primitive type for time_t
+// ******************************
+// run the following command from the shell on this file to find the
+// native time_t type:
+// gcc -E findtype-time_t.c | grep __time_t
 // THIS CAN ALSO BE USED TO FIND THE FUNDAMENTAL TYPE OF INCLUDED TYPES
+// ******************************
 
 // http://stackoverflow.com/a/471274
 // see also:
@@ -9,10 +14,6 @@
 
 #include <time.h>
 #include <stdio.h>
-
-// run the following command from the shell on this file to find the
-// native time_t type:
-// gcc -E findtype-time_t.c | grep __time_t
 
 int main(int argc, char** argv)
 {
