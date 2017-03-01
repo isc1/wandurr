@@ -84,7 +84,6 @@ int main()
     timespec currenttime;
 
     // check the time and set a future time to quit
-    //cout << "\nThis program uses clock_gettime() to wait " << delayms << " milliseconds.\n\n";
     clock_gettime(CLOCK_MONOTONIC, &waiter.now);
     schedulefuturetimespec(2112, &waiter.future);
     cout << "\nThis program uses clock_gettime() to wait " << delayms << " milliseconds.\n\n";
@@ -93,7 +92,7 @@ int main()
     printf("main(): Scheduled completion time: waiter.future.tv_sec: %ld  waiter.future.tv_nsec: %ld\n"
            , waiter.future.tv_sec, waiter.future.tv_nsec);
 
-    // sit in the loop unti the time to quit comes to pass
+    // sit in the loop until the time to quit comes to pass
     clock_gettime(CLOCK_MONOTONIC, &currenttime);
     while(!bail)
     {
