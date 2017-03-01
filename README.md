@@ -4,6 +4,8 @@
 
 A simple c++/ncurses game where you wander around and do stuff HURR DURR
 
+This game is mostly C, with a few C++ features used for convenience (like strings
+and vectors).
 The wandurr1 game is entirely contained in the file wandurr1.cpp, the other .cpp
 files in this repository are just examples that help illustrate some basic things
 like how to use clock_gettime(), how to pass a struct for writing and so on.
