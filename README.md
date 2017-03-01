@@ -1,4 +1,7 @@
 # wandurr
+
+![wandurr1screen](/wandurr1-20170301.jpg)
+
 A simple c++/ncurses game where you wander around and do stuff HURR DURR
 
 This game is really just a fun coding exercise for me, and I hope
