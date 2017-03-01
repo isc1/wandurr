@@ -1,4 +1,5 @@
-// wandurr1.cpp - game of wandering around doing stuff written in c++/ncurses hurr durr
+// wandurr1.cpp - game of wandering around doing stuff
+//   written in c++/ncurses hurr durr
 
 // copyright 2017 inhabited.systems
 // This program is covered by the MIT License.
@@ -48,7 +49,7 @@ typedef struct
 } Creature;
             
 int row = 0, col = 0, rows = 0, cols = 0;
-int rowrequired = 0, colrequired = 0;
+int rowrequired = 24, colrequired = 80;
 int rowoffset = 2, coloffset = 2;
 int helpmaxrow, helpmaxcol, helphalfrow, helphalfcol;
 int halfrow = 0, halfcol = 0;
@@ -76,12 +77,12 @@ void drawhelpwindow();
 void drawgamescreen();
 void crash(string msg);
 
-//                     _
+/*                     _
 //     _ __ ___   __ _(_)_ __
 //    | '_ ` _ \ / _` | | '_ \
 //    | | | | | | (_| | | | | |
 //    |_| |_| |_|\__,_|_|_| |_|
-//
+*/
 
 int main(void)
 {
@@ -92,16 +93,11 @@ int main(void)
     srand(timenow);
 
     // Do initial ncurses setup
-    // (I'd like to put this section in it's own function to
-    // clean up main but I think I had some weird problems
-    // when I tried that...)
     initscr();
     keypad(stdscr, TRUE);
     nonl();
     cbreak();
     echo();
-    // TODO: remove one of these keypad funcs, which one?
-    keypad(stdscr, TRUE);
 
     // Setup the UI and display the welcome message
     setupUI();
@@ -157,6 +153,7 @@ int main(void)
 
 void setupcolorpairs()
 {
+    // setup the background & text colors
     start_color();
     init_pair(0, COLOR_WHITE, COLOR_BLACK);
     init_pair(1, COLOR_WHITE, COLOR_RED);
@@ -173,6 +170,9 @@ void setupcolorpairs()
 
 void setuphelptext()
 {
+    // choose what to display in the Help popup, lines must be less
+    // than colrequired characters.
+
     // we run setup help text so that later if we want to limit
     // the game to not run if the window size is insufficient for
     // this text, we will be able to calculate the numbers for that.
@@ -192,7 +192,10 @@ void setuphelptext()
 
 void setuphelpwindow()
 {
-    // you know, you really ought to create a generic window display
+    // setup the size, location, color of help window and load
+    // the text from setuphelptext()
+
+    // TODO: really ought to create a generic window display
     // function, and use it for the intro screen, the help screens
     // and whatever other popup info this program uses.
 
@@ -200,9 +203,6 @@ void setuphelpwindow()
     string tmpstring;
     const char *cptr;
 
-    //helptext.push_back("WELCOME TO THE HELP MENU\n");
-    //helptext.push_back("ENJOY YOUR STAY\n");
-    //helptext.push_back("\n");
     linecount = helptextleft.size();
 
     if((helpwindowleft = newwin(rows-6,halfcol-3,3,3)) == NULL)
@@ -213,12 +213,6 @@ void setuphelpwindow()
     getmaxyx(helpwindowleft,helpmaxrow,helpmaxcol);
     helphalfrow = helpmaxrow/2;
     helphalfcol = helpmaxcol/2;
-
-    //wattrset(helpwindow,COLOR_PAIR(10));
-    //move(0,0);
-    //for(int i=0;i < helpmaxrow; i++)
-    //    for(int j=0; j < helpmaxcol; j++)
-    //        mvwaddch(helpwindow,i,j,'0');
     wbkgd(helpwindowleft,COLOR_PAIR(10));
     wrefresh(helpwindowleft);
 
@@ -237,6 +231,7 @@ void setuphelpwindow()
 
 void setupUI(void)
 {
+    // setup the basic main window, check that it is big enough
     curs_set(0);
     getmaxyx(stdscr,rows,cols);
     halfrow = rows/2;
@@ -251,15 +246,11 @@ void setupUI(void)
         crash("Your terminal does not support color, sorry!\n");
     setuphelptext();
     setuphelpwindow();
-    // DELETE next 3
-    //printw("helpmaxrow: %d helpmaxcol %d\n",helpmaxrow,helpmaxcol);
-    //refresh();
-    //getch();
 
     // Magic numbers are not the way to do this, but I don't have time
     // to calculate the minimum window size from the setuphelptext()
     // vector helptextleft & helptextright.
-    if(rows < 24 || cols < 80)
+    if(rows < rowrequired || cols < colrequired)
     {
         endwin();
         cout << "\n=============================================\n";
@@ -272,7 +263,10 @@ void setupUI(void)
 
 void schedulefuturetimespec(long delayms, timespec * futuretime)
 {
-    //long secs;
+    // given delayms (a number of milliseconds to delay) set the
+    // time in timespec struct form in the struct that is passed
+    // in as futuretime; a seconds part, and an additional
+    // nanoseconds part.
     unsigned long secs, nanosecs;
     timespec now;
 
@@ -286,16 +280,16 @@ void schedulefuturetimespec(long delayms, timespec * futuretime)
 
 void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
 {
+    // fill the game world with blanks, a few '$' chars and
+    // some "creatures" that will wander around.
     for (unsigned int i = 0; i < pvec.size(); i++)
     {
         for (unsigned int j = 0; j < pvec[i].size(); j++)
         {
             // this is supposed to be green
             pvec[i][j].color = 2;
-            //pvec[i][j].occupant = rand()%52+65;
             if (rand()%100==1) pvec[i][j].occupant = '$';
             else pvec[i][j].occupant = ' ';
-            // cout << "pvec[" << i << "][" << j << "] = " << pvec[i][j].color << "\n";
         }
     }
 
@@ -319,9 +313,9 @@ void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
 
 void print2dvec(vector<vector<Cell>> pvec, string title)
 {
+    // print out the 2d vector of int passed in as pvec
     // diagnostic function.  this doesn't normally get called.
     // TODO: change this crap to use ncurses instead of cout!!! or just delete this?
-    // print out the 2d vector of int passed in as pvec
     cout << "\n" << title << "\n";
     for (unsigned int i = 0; i < pvec.size(); i++)
     {
@@ -336,6 +330,7 @@ void print2dvec(vector<vector<Cell>> pvec, string title)
 
 void drawintroscreen()
 {
+    // draw the splash screen that is shown before the game proper begins
     int linecount;
     string tmpstring;
     const char *cptr;
@@ -352,13 +347,11 @@ void drawintroscreen()
     introtext.push_back("press ~ to quit.\n");
     introtext.push_back("\n");
     introtext.push_back("Press any key to begin!\n");
-    //introtext.push_back("GLORIOUS ADVENTURE OF SUPREME\n");
-    //introtext.push_back("COMPUTER GAME INTENSITY\n");
     introtext.push_back("\n");
     linecount = introtext.size();
-    // comment these out after debugging
-    linecount++;
 
+    // comment this section out after debugging if you like
+    linecount++;
     // Nice review of string concatenation options:
     // http://stackoverflow.com/a/900035
     tmpstring = "Screensize = (" + to_string(rows) + "," + to_string(cols) + ")";
@@ -370,9 +363,6 @@ void drawintroscreen()
         cptr = introtext[i].c_str();
         mvaddstr(halfrow-(linecount/2)+i,halfcol-introtext[i].length()/2,cptr);
     }
-    //mvprintw(halfrow,halfcol,"linecount: %d\n", linecount);
-    //mvaddstr(halfrow,halfcol,"Wandurr! Press any key to begin:\n");
-    //printw("rows: %d cols: %d", rows, cols);
     refresh();
     getch();
     nodelay(stdscr, TRUE);
@@ -380,10 +370,11 @@ void drawintroscreen()
 
 void drawhelpwindow()
 {
+    // draw the help window that was created by setuphelpwindow()
+    // and setuphelptext() on the screen
     nodelay(stdscr, FALSE);
     touchwin(helpwindowleft);
     wrefresh(helpwindowleft);
-    //mvaddstr(halfrow-10,halfcol,"drawhelpwindow() called\n");
     refresh();
     getch();
     nodelay(stdscr, TRUE);
@@ -393,7 +384,10 @@ void drawhelpwindow()
 
 void drawgamescreen()
 {
-    // ADD "Press ~ to quit" MSG PROMINENTLY ON SCREEN
+    // this function draws the game screen, and it has some bugs, such as
+    // the creatures "winking out" intermittently.  If I was going to do more
+    // with this game, I would do this properly, but this code works and I
+    // need to move on.
 
     // TODO: you don't need to update this every game tick.  just do it once
     // at screen setup or whatever
@@ -403,12 +397,10 @@ void drawgamescreen()
     // there should be a separate thing that modifies the game world, and
     // drawgamescreen should only read from that, never write to it...
 
-    // ALSO: in terms of sleeping the creatures so they don't move every
-    // gametick, you need to build a scheduler based on clock_gettime()
-    // there are examples of this in the c & cpp dirs, but see this file:
+    // creatures "sleep" according to clock_gettime().  See the following:
     // code/lrn/cpp/clockgettime.c 
-    // see also:
     // http://www.catb.org/esr/time-programming/
+    // https://blog.habets.se/2010/09/gettimeofday-should-never-be-used-to-measure-time.html
     // http://pubs.opengroup.org/onlinepubs/7908799/xsh/time.h.html
     // https://www.gnu.org/software/libc/manual/html_node/Date-and-Time.html#Date-and-Time
 
@@ -419,22 +411,25 @@ void drawgamescreen()
     clock_gettime(CLOCK_MONOTONIC, &currenttime);
     for(unsigned int i=0; i<creaturecount; i++)
     {
+        // preserved for debugging
         //clock_gettime(CLOCK_MONOTONIC, &creatures[i].curtime);
         //schedulefuturetimespec(basedelayms+(rand()%randdelayms), &creatures[i].nexttime);
         //mvprintw(5,5,"creature[%d] sec,nsec: %ld,%ld", i, creatures[i].nexttime.tv_sec, creatures[i].nexttime.tv_nsec);
         //mvprintw(5,5,"current time sec,nsec: %ld,%ld", i, creatures[i].curtime, creatures[i].nexttime);
+        // remember to shut off nodelay TRUE throughout this file if debugging...
         //getch();
 
+        // sleep our creatures so they don't continually jitter around the screen
         bool movecreature=false;
+        // move if the second AND nanosecond part has elapsed
         if(currenttime.tv_sec == creatures[i].nexttime.tv_sec)
             if(currenttime.tv_nsec >= creatures[i].nexttime.tv_nsec)
                 movecreature=true;
-        // also bail if we blew passed the seconds part entirely
+        // also move if we blew passed the seconds part entirely
         // (we don't care about the nanoseconds part in that case)
         if(currenttime.tv_sec > creatures[i].nexttime.tv_sec)
                 movecreature=true;
 
-        //mvaddch(creatures[i].row, creatures[i].col, ' ');
         if(movecreature)
         {
             schedulefuturetimespec(basedelayms+(rand()%randdelayms), &creatures[i].nexttime);
@@ -448,12 +443,6 @@ void drawgamescreen()
             if(creatures[i].row > rows-rowoffset) creatures[i].row=rows-rowoffset;
             if(creatures[i].col <0) creatures[i].col=0;
             if(creatures[i].col > cols-coloffset) creatures[i].col=cols-coloffset;
-            //gameworld[creatures[i].row][creatures[i].col].occupant =  creatures[i].icon;
-            //gameworld[creatures[i].rowprev][creatures[i].colprev].occupant =  ' ';
-
-            //creatures[i].row = rand()%rows-rowoffset;
-            //creatures[i].col = rand()%cols-coloffset;
-            //mvaddch(creatures[i].row, creatures[i].col, creatures[i].icon);
         }
         gameworld[creatures[i].row][creatures[i].col].occupant =  creatures[i].icon;
         gameworld[creatures[i].rowprev][creatures[i].colprev].occupant =  ' ';
@@ -462,7 +451,6 @@ void drawgamescreen()
     // draw game screen
     for(row=rowoffset; row < rows; row++) {
         for(col=coloffset; col < cols-3; col++) {
-            //move(row+rowoffset,col+coloffset);
             move(row,col);
             attrset(COLOR_PAIR(gameworld[row][col].color));
             if(gameworld[row][col].occupant == '$')
@@ -474,10 +462,12 @@ void drawgamescreen()
         }
     }
 
+    // draw the player
     attrset(COLOR_PAIR(9));
     move(player.row,player.col);
     addch('X');
 
+    // draw status info
     mvprintw(3,50,"occupant: %d", gameworld[player.row][player.col].occupant);
     if(gameworld[player.row][player.col].occupant == '$')
     {
@@ -494,6 +484,8 @@ void drawgamescreen()
 
 void crash(string msg)
 {
+    // this is a generic crash function that we call if something goes wrong
+    // and we need to bail to the shell.
     // USEFUL TIP: http://stackoverflow.com/a/347959
     // also: http://stackoverflow.com/questions/1524356/c-deprecated-conversion-from-string-constant-to-char
     const char * cptr = msg.c_str();
