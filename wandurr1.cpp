@@ -397,7 +397,7 @@ void drawgamescreen()
     // drawgamescreen should only read from that, never write to it...
 
     // creatures "sleep" according to clock_gettime().  See the following:
-    // code/lrn/cpp/clockgettime.c 
+    // msdelay.cpp in this repo
     // http://www.catb.org/esr/time-programming/
     // https://blog.habets.se/2010/09/gettimeofday-should-never-be-used-to-measure-time.html
     // http://pubs.opengroup.org/onlinepubs/7908799/xsh/time.h.html
