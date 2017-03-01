@@ -9,7 +9,7 @@ files in this repository are just examples that help illustrate some basic thing
 like how to use clock_gettime(), how to pass a struct for writing and so on.
 
 This game is really just a fun coding exercise for me, and I hope
-I write it in such a way that new c++ coders might be able to
+I write it in such a way that new(ish) c/c++ coders might be able to
 have fun playing around with a little game programming, with less complexity
 than they would with a real graphical toolkit. :)
 
