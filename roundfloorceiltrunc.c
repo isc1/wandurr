@@ -1,4 +1,6 @@
-/* round vs floor vs ceil vs trunc */
+/* round vs floor vs ceil vs trunc
+  from: http://www.cplusplus.com/reference/cmath/trunc/
+*/
 #include <stdio.h>      /* printf */
 #include <math.h>       /* round, floor, ceil, trunc */
 

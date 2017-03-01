@@ -1,4 +1,5 @@
 // wandurr1.cpp - game of wandering around doing stuff written in c++/ncurses hurr durr
+
 // copyright 2017 inhabited.systems
 // This program is covered by the MIT License.
 // See the file LICENSE included with this distribution for terms.
@@ -11,10 +12,15 @@
 
 // wandurr1 is mostly c with a few c++ conveniences thrown in (like strings & vectors).
 
+// c includes
 #include <stdlib.h>
 #include <ncurses.h>
 #include <math.h>
 #include <signal.h>
+#include <time.h>
+#include <unistd.h>
+
+// c++ includes
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -29,16 +35,16 @@ typedef struct {
 
 typedef struct
 {
-    int         id;
-    string      name;
-    char        icon;
-    int         row;
-    int         col;
-    int         rowprev;
-    int         colprev;
-    //time        curtime;
-    //time        futuretime;
-    int         coins;
+    int         id;             // Unused. unique to each creature.
+    string      name;           // Unused. creature's name
+    char        icon;           // letter that represents creature on screen
+    int         row;            // screen row coord
+    int         col;            // screen col coord
+    int         rowprev;        // last row location
+    int         colprev;        // last col location
+    timespec    curtime;        // current time from clock_gettime()
+    timespec    nexttime;       // time to wait until next action
+    int         coins;          // Unused.  qty coins creature has picked up
 } Creature;
             
 int row = 0, col = 0, rows = 0, cols = 0;
@@ -64,6 +70,7 @@ void setuphelpwindow();
 void gameworldinit(vector<vector<Cell>>& pvec, int rsize);
 void print2dvec(vector<vector<Cell>> pvec, string title);
 void setupUI();
+void schedulefuturetimespec(long delayms, timespec * futuretime);
 void drawintroscreen();
 void drawhelpwindow();
 void drawgamescreen();
@@ -78,8 +85,9 @@ int main(void)
     srand(timenow);
 
     // Do initial ncurses setup
-    // (I'd like to put this in it's own function to clean up main
-    // but I think I had some weird problems when I tried that...)
+    // (I'd like to put this section in it's own function to
+    // clean up main but I think I had some weird problems
+    // when I tried that...)
     initscr();
     keypad(stdscr, TRUE);
     nonl();
@@ -163,7 +171,7 @@ void setuphelptext()
     // this text, we will be able to calculate the numbers for that.
 
     // VERSION
-    helptextleft.push_back("-=Wandurr1 v170225=-");
+    helptextleft.push_back("-=Wandurr1 v170301=-");
     helptextleft.push_back("WELCOME TO THE HELP MENU hurr durr");
     helptextleft.push_back("BEHOLD HOW HELPFUL IT IS hurr durr");
     helptextleft.push_back(" ");
@@ -255,6 +263,20 @@ void setupUI(void)
     }
 }
 
+void schedulefuturetimespec(long delayms, timespec * futuretime)
+{
+    //long secs;
+    unsigned long secs, nanosecs;
+    timespec now;
+
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    secs = trunc(delayms/1000);
+    nanosecs = (delayms*1000000)-(secs*1000000000);
+    futuretime->tv_sec = now.tv_sec + secs;
+    futuretime->tv_nsec = now.tv_nsec + nanosecs;
+}
+
+
 void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
 {
     for (unsigned int i = 0; i < pvec.size(); i++)
@@ -284,6 +306,7 @@ void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
         tmpcreature.rowprev = tmpcreature.row;
         tmpcreature.colprev = tmpcreature.col;
         creatures.push_back(tmpcreature);
+        schedulefuturetimespec(1, &creatures[i].nexttime);
     }
 }
 
@@ -382,28 +405,54 @@ void drawgamescreen()
     // http://pubs.opengroup.org/onlinepubs/7908799/xsh/time.h.html
     // https://www.gnu.org/software/libc/manual/html_node/Date-and-Time.html#Date-and-Time
 
+    long basedelayms=100, randdelayms=700;
+    timespec currenttime;
+
+    // move creatures
+    clock_gettime(CLOCK_MONOTONIC, &currenttime);
     for(unsigned int i=0; i<creaturecount; i++)
     {
-        int rowmod = rand()%3-1;
-        int colmod = rand()%3-1;
+        //clock_gettime(CLOCK_MONOTONIC, &creatures[i].curtime);
+        //schedulefuturetimespec(basedelayms+(rand()%randdelayms), &creatures[i].nexttime);
+        //mvprintw(5,5,"creature[%d] sec,nsec: %ld,%ld", i, creatures[i].nexttime.tv_sec, creatures[i].nexttime.tv_nsec);
+        //mvprintw(5,5,"current time sec,nsec: %ld,%ld", i, creatures[i].curtime, creatures[i].nexttime);
+        //getch();
+
+        bool movecreature=false;
+        if(currenttime.tv_sec == creatures[i].nexttime.tv_sec)
+            if(currenttime.tv_nsec >= creatures[i].nexttime.tv_nsec)
+                movecreature=true;
+        // also bail if we blew passed the seconds part entirely
+        // (we don't care about the nanoseconds part in that case)
+        if(currenttime.tv_sec > creatures[i].nexttime.tv_sec)
+                movecreature=true;
 
         //mvaddch(creatures[i].row, creatures[i].col, ' ');
-        creatures[i].rowprev = creatures[i].row;
-        creatures[i].colprev = creatures[i].col;
-        creatures[i].row += rowmod;
-        creatures[i].col += colmod;
-        if(creatures[i].row <0) creatures[i].row=0;
-        if(creatures[i].row > rows-rowoffset) creatures[i].row=rows-rowoffset;
-        if(creatures[i].col <0) creatures[i].col=0;
-        if(creatures[i].col > cols-coloffset) creatures[i].col=cols-coloffset;
+        if(movecreature)
+        {
+            schedulefuturetimespec(basedelayms+(rand()%randdelayms), &creatures[i].nexttime);
+            int rowmod = rand()%3-1;
+            int colmod = rand()%3-1;
+            creatures[i].rowprev = creatures[i].row;
+            creatures[i].colprev = creatures[i].col;
+            creatures[i].row += rowmod;
+            creatures[i].col += colmod;
+            if(creatures[i].row <0) creatures[i].row=0;
+            if(creatures[i].row > rows-rowoffset) creatures[i].row=rows-rowoffset;
+            if(creatures[i].col <0) creatures[i].col=0;
+            if(creatures[i].col > cols-coloffset) creatures[i].col=cols-coloffset;
+            //gameworld[creatures[i].row][creatures[i].col].occupant =  creatures[i].icon;
+            //gameworld[creatures[i].rowprev][creatures[i].colprev].occupant =  ' ';
+
+            //creatures[i].row = rand()%rows-rowoffset;
+            //creatures[i].col = rand()%cols-coloffset;
+            //mvaddch(creatures[i].row, creatures[i].col, creatures[i].icon);
+        }
         gameworld[creatures[i].row][creatures[i].col].occupant =  creatures[i].icon;
         gameworld[creatures[i].rowprev][creatures[i].colprev].occupant =  ' ';
-
-        //creatures[i].row = rand()%rows-rowoffset;
-        //creatures[i].col = rand()%cols-coloffset;
-        //mvaddch(creatures[i].row, creatures[i].col, creatures[i].icon);
     }
     
+    // draw game screen
     for(row=rowoffset; row < rows; row++) {
         for(col=coloffset; col < cols-3; col++) {
             //move(row+rowoffset,col+coloffset);
@@ -432,6 +481,7 @@ void drawgamescreen()
     mvprintw(3,3,"Score: %d", score);
     mvprintw(3,15,"player.row: %d  player.col: %d   ", player.row, player.col);
     mvprintw(4,5,"rows,cols: %d,%d  ",rows,cols);
+    mvprintw(4,30, "Press = for help screen");
     refresh();
 }
 
