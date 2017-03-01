@@ -6,7 +6,8 @@ A simple c++/ncurses game where you wander around and do stuff HURR DURR
 
 This game is really just a fun coding exercise for me, and I hope
 I write it in such a way that new c++ coders might be able to
-have fun playing around with a little game programming. :)
+have fun playing around with a little game programming, with less complexity
+than they would with a real graphical toolkit. :)
 
 These instructions work on Ubuntu, which is a flavor of Debian, which is a
 type of Linux.
