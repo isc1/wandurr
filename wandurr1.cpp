@@ -424,7 +424,7 @@ void drawgamescreen()
         if(currenttime.tv_sec == creatures[i].nexttime.tv_sec)
             if(currenttime.tv_nsec >= creatures[i].nexttime.tv_nsec)
                 movecreature=true;
-        // also move if we blew passed the seconds part entirely
+        // also move if we blew past the seconds part entirely
         // (we don't care about the nanoseconds part in that case)
         if(currenttime.tv_sec > creatures[i].nexttime.tv_sec)
                 movecreature=true;
