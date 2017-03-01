@@ -10,7 +10,7 @@ The wandurr1 game is entirely contained in the file wandurr1.cpp, the other .cpp
 files in this repository are just examples that help illustrate some basic things
 like how to use clock_gettime(), how to pass a struct for writing and so on.
 
-This game is really just a fun coding exercise for me, and I hope
+This game is really just a fun coding exercise for me, but I hope
 I write it in such a way that new(ish) c/c++ coders might be able to
 have fun playing around with a little game programming, with less complexity
 than they would with a real graphical framework. :)
