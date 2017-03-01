@@ -33,12 +33,8 @@ unsigned long convmstotimespec(int millisecs)
     timespec now;
 
     clock_gettime(CLOCK_MONOTONIC, &now);
-
     secs = trunc(millisecs/1000);
     nanosecs = (millisecs*1000000)-(secs*1000000000);
-
-    cout << "\nconvmstotimespec(): millisecs: " << millisecs << " secs: " << secs << " nanosecs: " << nanosecs << "\n";
-    
     return(nanosecs);
 }
 
@@ -58,34 +54,14 @@ void schedulefuturetimespec(long delayms, timespec * futuretime)
 
 int main()
 {
-    timespec currenttime, futuretime;
-    //long currenttimens, futuretimens;
+    long delayms=2112;
+    timespec currenttime;
 
-    /*
-    cout << "\nmain(): ms 500: " << convmstotimespec(500);
-    cout << "\nmain(): ms 1500: " << convmstotimespec(1700);
-    cout << "\nmain(): ms 3900: " << convmstotimespec(3900);
-    */
-
-    clock_gettime(CLOCK_MONOTONIC, &waiter.now);
-    printf("\nwaiter.now.tv_sec: %ld  waiter.now.tv_nsec: %ld\n", waiter.now.tv_sec, waiter.now.tv_nsec);
-
-    /*
-    schedulefuturetimespec(550, &futuretime);
-    printf("futuretime.tv_sec=%ld futuretime.tv_nsec=%ld\n", futuretime.tv_sec, futuretime.tv_nsec);
-    schedulefuturetimespec(2147, &futuretime);
-    printf("futuretime.tv_sec=%ld futuretime.tv_nsec=%ld\n", futuretime.tv_sec, futuretime.tv_nsec);
-    schedulefuturetimespec(2148, &futuretime);
-    printf("futuretime.tv_sec=%ld futuretime.tv_nsec=%ld\n", futuretime.tv_sec, futuretime.tv_nsec);
-    */
-
-    //std::vector<int> v(100000000, 42);
-    //sink = std::accumulate(v.begin(), v.end(), 0u); 
-
+    cout << "\n\nThis program uses clock_gettime() to wait " << delayms << " milliseconds.\n\n";
     clock_gettime(CLOCK_MONOTONIC, &waiter.now);
     schedulefuturetimespec(2112, &waiter.future);
-    printf("main(): waiter.now.tv_sec: %ld  waiter.now.tv_nsec: %ld\n", waiter.now.tv_sec, waiter.now.tv_nsec);
-    printf("main(): waiter.future.tv_sec: %ld  waiter.future.tv_nsec: %ld\n", waiter.future.tv_sec, waiter.future.tv_nsec);
+    printf("main(): Start time:                waiter.now.tv_sec:    %ld  waiter.now.tv_nsec:    %ld\n", waiter.now.tv_sec, waiter.now.tv_nsec);
+    printf("main(): Scheduled completion time: waiter.future.tv_sec: %ld  waiter.future.tv_nsec: %ld\n", waiter.future.tv_sec, waiter.future.tv_nsec);
 
     long i;
     bool bail=false;
@@ -96,18 +72,11 @@ int main()
         clock_gettime(CLOCK_MONOTONIC, &currenttime);
         if(currenttime.tv_sec >= waiter.future.tv_sec)
             if(currenttime.tv_nsec >= waiter.future.tv_nsec)
-        //if(currenttime.tv_sec >= futuretime.tv_sec && currenttime.tv_nsec >= futuretime.tv_nsec)
         {
             bail=true;
         }
-        //napms(300);
-        //printf("main(): waiter.future.tv_sec: %ld  waiter.future.tv_nsec: %ld\n", waiter.future.tv_sec, waiter.future.tv_nsec);
-        //cout << "\nsec: " << currenttime.tv_sec << " nsec: " << currenttime.tv_nsec << "\n";
-        //printf("sec: %ld nsec: %ld\n", currenttime.tv_sec, currenttime.tv_nsec);
     }
-
-    cout << "\nDONE!\n";
-    //clock_gettime(CLOCK_MONOTONIC, &waiter.later);
-    //printf("waiter.later.tv_sec: %ld  waiter.later.tv_nsec: %ld\n", waiter.later.tv_sec, waiter.later.tv_nsec);
-
+    clock_gettime(CLOCK_MONOTONIC, &waiter.now);
+    printf("main(): Actual completion time:    waiter.now.tv_sec:    %ld  waiter.now.tv_nsec:    %ld\n", waiter.now.tv_sec, waiter.now.tv_nsec);
+    cout << "DONE!\n\n";
 }
