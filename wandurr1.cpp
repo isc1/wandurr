@@ -76,6 +76,13 @@ void drawhelpwindow();
 void drawgamescreen();
 void crash(string msg);
 
+//                     _
+//     _ __ ___   __ _(_)_ __
+//    | '_ ` _ \ / _` | | '_ \
+//    | | | | | | (_| | | | | |
+//    |_| |_| |_|\__,_|_|_| |_|
+//
+
 int main(void)
 {
     // seed random number generator
