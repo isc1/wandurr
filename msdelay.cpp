@@ -4,7 +4,7 @@
 // this is a demonstrator program for the use of time in the wandurr1.cpp game
 // mainly used to delay creature actions in the game world.
 
-// For time, we use time.h/unistd.h clock_gettime(). see:
+// For time, we use time.h clock_gettime(). see:
 // http://en.cppreference.com/w/c/chrono/clock
 // ...if you are getting weird time problems at 2147 seconds (or some multiple thereof)
 // it's an int (or 32-bit) overflow problem. Use longs.
