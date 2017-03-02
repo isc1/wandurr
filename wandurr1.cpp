@@ -18,8 +18,6 @@
 #include <ncurses.h> // NCURSES, WAT DO?:  http://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
 #include <math.h>
 #include <time.h>
-#include <unistd.h>
-//#include <signal.h>
 
 // c++ includes
 #include <iostream>

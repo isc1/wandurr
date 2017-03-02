@@ -32,9 +32,6 @@
 #include <time.h>
 #include <stdio.h>
 #include <math.h>
-// docs say clock_gettime() lives in time.h, but I get compiler errors unless
-// I inlude unistd.h
-#include <unistd.h>
 
 // c++ includes
 #include <iostream>
@@ -91,6 +88,7 @@ int main()
            , waiter.now.tv_sec, waiter.now.tv_nsec);
     printf("main(): Scheduled completion time: waiter.future.tv_sec: %ld  waiter.future.tv_nsec: %ld\n"
            , waiter.future.tv_sec, waiter.future.tv_nsec);
+    printf("...waiting %ld milliseconds...\n", delayms);
 
     // sit in the loop until the time to quit comes to pass
     clock_gettime(CLOCK_MONOTONIC, &currenttime);
