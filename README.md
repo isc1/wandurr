@@ -4,19 +4,29 @@
 
 A simple c++/ncurses game where you wander around and do stuff HURR DURR
 
+What can you do in this game?  Well, not a whole lot.  You can walk around,
+pick up '$' characters to increase your score, look at the '*' creatures
+walking around, view the popup help menu, and that's about it.
+
+This game is really just a fun coding exercise for me, but someone who
+has a bit of experience in C might be able to expand on this to make a
+simple game with a little more to it, without having to deal with all the
+complexity of a real graphical framework.
+
+On the other hand, there is something to be said for diving in and trying to
+learn something like Qt, or SFML, or WxWidgets, or whatever.  But I've worked
+with Qt, which I really like, and done a little bit with SFML, and I have to
+say that ncurses is easier, smaller and simpler to get started with.  To each
+his own.
+
 This game is mostly C, with a few C++ features used for convenience (like strings
-and vectors).
-The wandurr1 game is entirely contained in the file wandurr1.cpp, the other .cpp
-files in this repository are just examples that help illustrate some basic things
-like how to use clock_gettime(), how to pass a struct for writing and so on.
+and vectors).  The wandurr1 game is entirely contained in the file wandurr1.cpp,
+the other .cpp files in this repository are just examples that help illustrate
+some basic things like how to use clock_gettime(), how to pass a struct for
+writing and so on.
 
-This game is really just a fun coding exercise for me, but I hope
-I write it in such a way that new(ish) c/c++ coders might be able to
-have fun playing around with a little game programming, with less complexity
-than they would with a real graphical framework. :)
-
-These instructions work on Ubuntu, which is a flavor of Debian, which is a
-type of Linux.
+The following compile instructions work on Ubuntu, which is a flavor of Debian,
+which is a type of Linux.
 
 If you don't have an Ubuntu machine, you can either install Ubuntu on your
 computer at home by learning here:
