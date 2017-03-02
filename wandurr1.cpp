@@ -15,16 +15,15 @@
 
 // c includes
 #include <stdlib.h>
-#include <ncurses.h>
+#include <ncurses.h> // NCURSES, WAT DO?:  http://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
 #include <math.h>
-#include <signal.h>
 #include <time.h>
 #include <unistd.h>
+//#include <signal.h>
 
 // c++ includes
 #include <iostream>
 #include <vector>
-#include <queue>
 #include <string>
 using namespace std;
 
