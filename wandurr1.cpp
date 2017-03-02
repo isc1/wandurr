@@ -58,7 +58,7 @@ int score = 0;
 // REMEMBER TO UPDATE cpairs WHEN YOU ADD COLORS hurr durr
 const int cpairs=10;
 
-vector<vector<Cell> > gameworld;
+vector<vector<Cell>> gameworld;
 vector<string> helptextleft, helptextright;
 WINDOW *helpwindowleft, *helpwindowright;
 Creature player;

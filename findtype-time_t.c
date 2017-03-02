@@ -3,7 +3,8 @@
 // run the following command from the shell on this file to find the
 // native time_t type:
 // gcc -E findtype-time_t.c | grep __time_t
-// THIS CAN ALSO BE USED TO FIND THE FUNDAMENTAL TYPE OF INCLUDED TYPES
+// THIS CAN ALSO BE USED TO FIND THE FUNDAMENTAL TYPE OF ANY TYPE THAT
+// IS INCLUDED FROM A .h FILE
 // ******************************
 
 // http://stackoverflow.com/a/471274
