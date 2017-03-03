@@ -92,7 +92,6 @@ int main(void)
     int ch = 0;
     time_t timenow;
     timenow = time(NULL);
-    // TRY IT: what happens if you comment the next line out?
     srand(timenow);
 
     // Do initial ncurses setup
