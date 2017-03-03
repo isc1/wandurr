@@ -45,6 +45,11 @@ typedef struct
     int         coins;          // Unused.  qty coins creature has picked up
 } Creature;
             
+// Global Variables
+// TRY IT: change these numbers (one at a time!) and then recompile
+// this program and see what changed!  If you change a lot of them
+// and want to get them back to how they were originally, just visit:
+// https://github.com/isc1/wandurr/blob/master/wandurr1.cpp
 int row = 0, col = 0, rows = 0, cols = 0;
 int rowrequired = 24, colrequired = 80;
 int rowoffset = 2, coloffset = 2;
@@ -87,6 +92,7 @@ int main(void)
     int ch = 0;
     time_t timenow;
     timenow = time(NULL);
+    // TRY IT: what happens if you comment the next line out?
     srand(timenow);
 
     // Do initial ncurses setup
@@ -101,6 +107,7 @@ int main(void)
     drawintroscreen();
 
     // Turn nodelay on AFTER intro screen is done
+    // TRY IT: what happens if you comment the next line out?
     nodelay(stdscr, TRUE);
 
     // Initialize the gameworld
@@ -122,6 +129,7 @@ int main(void)
             // "tunnelling" which could be good for a dig dug kinda game
             // or maybe an ant colony sim
             case KEY_DOWN:
+                // TRY IT: what happens if you comment the next line out?
                 if(player.row < rows-1) player.row++;
                 break;
             case KEY_UP:
@@ -183,6 +191,7 @@ void setuphelptext()
     helptextleft.push_back("Pick up $ to increase score.");
     helptextleft.push_back("press = for Help.");
     helptextleft.push_back("press ~ to quit.");
+    helptextleft.push_back("Add your own message here!");
     helptextleft.push_back(" ");
 }
 
@@ -209,6 +218,7 @@ void setuphelpwindow()
     getmaxyx(helpwindowleft,helpmaxrow,helpmaxcol);
     helphalfrow = helpmaxrow/2;
     helphalfcol = helpmaxcol/2;
+    // TRY IT: what happens if you comment the next line out?
     wbkgd(helpwindowleft,COLOR_PAIR(10));
     wrefresh(helpwindowleft);
 
@@ -291,7 +301,7 @@ void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
 
     Creature tmpcreature;
     tmpcreature.id = 0;
-    tmpcreature.name = "CLYDE";
+    tmpcreature.name = "CLYDE"; // clyde is one of our cats, long live clyde hurr durr
     tmpcreature.icon = '*';
     tmpcreature.row = 0;
     tmpcreature.col = 0;
@@ -426,6 +436,9 @@ void drawgamescreen()
         if(currenttime.tv_sec > creatures[i].nexttime.tv_sec)
                 movecreature=true;
 
+        // TRY IT: what happens if you uncomment the next line?
+        //movecreature=true;
+
         if(movecreature)
         {
             schedulefuturetimespec(basedelayms+(rand()%randdelayms), &creatures[i].nexttime);
@@ -467,7 +480,9 @@ void drawgamescreen()
     mvprintw(3,50,"occupant: %d", gameworld[player.row][player.col].occupant);
     if(gameworld[player.row][player.col].occupant == '$')
     {
+        // TRY IT: what happens if you comment the next line out?
         score++;
+        // TRY IT: what happens if you comment the next line out?
         gameworld[player.row][player.col].occupant = ' ';
         mvprintw(3,3,"Score: %d", score);
     }
