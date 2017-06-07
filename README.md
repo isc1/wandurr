@@ -57,4 +57,4 @@ Then run the game by typing this:
 
     ./wandurr1
 
-Thanks for stopping by!
+Thanks for stopping by! :)
