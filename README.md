@@ -31,7 +31,7 @@ which is a type of Linux.
 If you don't have an Ubuntu machine, you can either install Ubuntu on your
 computer at home by learning here:
     https://www.ubuntu.com/download/desktop/install-ubuntu-desktop
-...or you can create a virtual Ubuntu host at somewhere like digitalocean.com
+...or you can create a virtual Ubuntu host at somewhere like [digitalocean.com](https://www.digitalocean.com/) or [vultr.com] (https://www.vultr.com/)
 for a few dollars a month.  I may add instructions later for how to build on
 Windows and OS X machines, but I don't have that now. :-(
 
