@@ -39,8 +39,7 @@ typing the following command at the shell prompt (you need sudo access):
     sudo apt-get install build-essential git libncurses5-dev libncursesw5-dev
 
 If you don't have sudo access, google "get sudo access ubuntu" in order to run
-the previous sudo apt-get command.  When that finishes, type exit to return to
-your normal user account.
+the previous sudo apt-get command.
 
 Then run these commands at the linux shell prompt:
 
