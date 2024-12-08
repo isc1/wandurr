@@ -23,9 +23,16 @@
 #include <iostream>
 #include <vector>
 #include <string>
+
+// Add these includes for wide character support
+#include <locale.h>
+#include <wchar.h>
+
 using namespace std;
 
 // Globals
+
+/* original char based gameboard
 typedef struct {
     char    occupant;
     char    color;
@@ -44,7 +51,29 @@ typedef struct
     timespec    nexttime;       // time to wait until next action
     int         coins;          // Unused.  qty coins creature has picked up
 } Creature;
+*/
             
+// Modify the Cell struct to use wide char instead of char
+typedef struct {
+    wchar_t occupant;  // Changed from char to wchar_t
+    char    color;
+} Cell;
+
+typedef struct
+{
+    int         id;
+    string      name;
+    wchar_t     icon;  // Changed from char to wchar_t
+    int         row;
+    int         col;
+    int         rowprev;
+    int         colprev;
+    timespec    curtime;
+    timespec    nexttime;
+    int         coins;
+} Creature;
+
+
 // Global Variables
 // TRY IT: change these numbers (one at a time!) and then recompile
 // this program and see what changed!  If you change a lot of them
@@ -94,8 +123,18 @@ int main(void)
     timenow = time(NULL);
     srand(timenow);
 
+    /* original init
     // Do initial ncurses setup
     initscr();
+    keypad(stdscr, TRUE);
+    nonl();
+    cbreak();
+    echo();
+    */
+
+    // Do initial ncurses setup
+    initscr();
+    setlocale(LC_ALL, "");    // Set up locale for Unicode support
     keypad(stdscr, TRUE);
     nonl();
     cbreak();
@@ -187,7 +226,7 @@ void setuphelptext()
     helptextleft.push_back(" ");
     helptextleft.push_back("In Game:");
     helptextleft.push_back("Use arrow keys to move.");
-    helptextleft.push_back("Pick up $ to increase score.");
+    helptextleft.push_back("Pick up ⭐ to increase score.");
     helptextleft.push_back("press = for Help.");
     helptextleft.push_back("press ~ to quit.");
     helptextleft.push_back("Add your own message here!");
@@ -293,8 +332,8 @@ void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
         {
             // this is supposed to be green
             pvec[i][j].color = 2;
-            if (rand()%100==1) pvec[i][j].occupant = '$';
-            else pvec[i][j].occupant = ' ';
+            if (rand()%100==1) pvec[i][j].occupant = L'⭐';
+            else pvec[i][j].occupant = L' ';
         }
     }
 
@@ -302,7 +341,8 @@ void gameworldinit(vector<vector<Cell>>& pvec, int rsize)
     tmpcreature.id = 0;
     tmpcreature.name = "CLYDE"; // clyde is one of our cats, long live clyde hurr durr
     //tmpcreature.icon = '*';
-    tmpcreature.icon = 'ƛ';
+    //tmpcreature.icon = L'ƛ';
+    tmpcreature.icon = L'♈';
     tmpcreature.row = 0;
     tmpcreature.col = 0;
     tmpcreature.coins = 0;
@@ -348,7 +388,7 @@ void drawintroscreen()
     introtext.push_back("\n");
     introtext.push_back("In Game:\n");
     introtext.push_back("Use arrow keys to move.\n");
-    introtext.push_back("Pick up $ to increase score.\n");
+    introtext.push_back("Pick up ⭐ to increase score.\n");
     introtext.push_back("press = for Help.\n");
     introtext.push_back("press ~ to quit.\n");
     introtext.push_back("\n");
@@ -457,6 +497,7 @@ void drawgamescreen()
         gameworld[creatures[i].rowprev][creatures[i].colprev].occupant =  ' ';
     }
     
+/* original 8bit chars
     // draw game screen
     for(row=rowoffset; row < rows; row++) {
         for(col=coloffset; col < cols-3; col++) {
@@ -470,20 +511,42 @@ void drawgamescreen()
             addch(gameworld[row][col].occupant);
         }
     }
+*/
+
+    // Instead of addch(), use addwstr() for wide characters
+    wchar_t ch[2] = {0, 0};  // Single character + null terminator
+    
+    for(row=rowoffset; row < rows; row++) {
+        for(col=coloffset; col < cols-3; col++) {
+            move(row,col);
+            attrset(COLOR_PAIR(gameworld[row][col].color));
+//            if(gameworld[row][col].occupant == L'$')
+            if(gameworld[row][col].occupant == L'⭐')
+                attrset(COLOR_PAIR(8));
+            else
+                attrset(COLOR_PAIR(2));
+
+            ch[0] = gameworld[row][col].occupant;
+            addwstr(ch);
+        }
+    }
 
     // draw the player
     attrset(COLOR_PAIR(9));
     move(player.row,player.col);
-    addch('X');
+    // orig 8bit char
+    //addch('X');
+    ch[0] = L'☺';
+    addwstr(ch);
 
     // draw status info
     mvprintw(3,50,"occupant: %d", gameworld[player.row][player.col].occupant);
-    if(gameworld[player.row][player.col].occupant == '$')
+    if(gameworld[player.row][player.col].occupant == L'⭐')
     {
         // TRY IT: what happens if you comment the next line out?
         score++;
         // TRY IT: what happens if you comment the next line out?
-        gameworld[player.row][player.col].occupant = ' ';
+        gameworld[player.row][player.col].occupant = L' ';
         mvprintw(3,3,"Score: %d", score);
     }
     mvprintw(3,3,"Score: %d", score);

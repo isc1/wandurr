@@ -53,6 +53,7 @@ _testmain.go
 # isc1: my custom ignores
 core
 wandurr1
+wandurrw
 
 # isc1: these are names I commonly use for junk files
 bkp
